@@ -651472,12 +651472,12 @@
     {
       "tm":0,
       "cm":"play",
-      "dr":300
+      "dr":330
     },
     {
-      "tm":100,
-      "cm":"name:loop\r\nloopDelay: 10\r\nloopExternal: false",
-      "dr":200
+      "tm":50,
+      "cm":"name:loop\r\nloopDelay: 0\r\nloopExternal: false",
+      "dr":280
     },
     {
       "tm":300,
