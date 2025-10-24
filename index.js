@@ -194,7 +194,7 @@ webcg.on('data', function (data) {
     console.log('data from casparcg received')
     console.log(JSON.stringify(data, null, 2));
     for (var key in data) {
-    if (key.includes("Color")) {
+    if (key.includes("color")) {
         checkandcolor(key, data[key]);
     }
     if (key.includes("opacidad")) {
@@ -429,3 +429,21 @@ webcg.on('update', function () {
 
     }
 });
+
+
+let sfxPlayed = false; // prevent it from playing multiple times
+
+        anim.addEventListener('enterFrame', (e) => {
+        const currentFrame = e.currentTime;
+
+        // Example: play sound around frame 5
+        if (currentFrame >= 1 && !sfxPlayed) {
+            const audio = document.getElementById('sfxOut');
+            audio.volume = 1.0;
+            audio.currentTime = 0;
+            audio.play();
+            sfxPlayed = true;
+        }
+
+        
+        });

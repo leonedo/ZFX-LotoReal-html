@@ -15503,8 +15503,8 @@
           "c": {
             "a": 0,
             "k": [
-              0.521568655968,
-              0.854901969433,
+              0.121568655968,
+              0.254901969433,
               0,
               1
             ],
@@ -15517,7 +15517,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_sr_bolo1",
+          "cl": "color_sr_bolo1",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -15623,7 +15624,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_sr_bolo2",
+          "cl": "color_sr_bolo2",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -15638,8 +15640,8 @@
       "ddd": 0,
       "ind": 66,
       "ty": 4,
-      "nm": ".Bolo_3_SUENO_R (EDIT)",
-      "cl": "Bolo_3_SUENO_R",
+      "nm": ".sr_bolo3",
+      "cl": "sr__bolo3",
       "tt": 1,
       "tp": 3,
       "sr": 1,
@@ -15729,7 +15731,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_sr_bolo3",
+          "cl": "color_sr_bolo3",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -15744,8 +15747,8 @@
       "ddd": 0,
       "ind": 67,
       "ty": 4,
-      "nm": ".Bolo_4_SUENO_R (EDIT)",
-      "cl": "Bolo_4_SUENO_R",
+      "nm": ".sr_bolo4",
+      "cl": "_sr_bolo4",
       "tt": 1,
       "tp": 3,
       "sr": 1,
@@ -15835,7 +15838,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_sr_bolo4",
+          "cl": "color_sr_bolo4",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -15927,7 +15931,7 @@
           "c": {
             "a": 0,
             "k": [
-              0.203921571374,
+              0.903921571374,
               0.603921592236,
               1,
               1
@@ -15941,7 +15945,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_sr_bolo5",
+          "cl": "color_sr_bolo5",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -16046,7 +16051,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_lp_bolo1",
+          "cl": "color_lp_bolo1",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -16151,7 +16157,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_lp_bolo2",
+          "cl": "color_lp_bolo2",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -16256,7 +16263,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_lp_bolo3",
+          "cl": "color_lp_bolo3",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -16361,7 +16369,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_lp_bolo4",
+          "cl": "color_lp_bolo4",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -16453,7 +16462,7 @@
             "a": 0,
             "k": [
               1,
-              0.90708976984,
+              0.50708976984,
               0.23573833704,
               1
             ],
@@ -16466,7 +16475,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_ny_bolo1",
+          "cl": "color_ny_bolo1",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -16571,7 +16581,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+           "nm": ".color_ny_bolo2",
+          "cl": "color_ny_bolo2",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -16676,7 +16687,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+           "nm": ".color_ny_bolo3",
+          "cl": "color_ny_bolo3",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -16691,8 +16703,8 @@
       "ddd": 0,
       "ind": 76,
       "ty": 4,
-      "nm": ".Manzanita_Amarilla",
-      "cl": "Manzanita_Amarilla",
+      "nm": ".opacidad_manzanita_amarilla",
+      "cl": "opacidad_manzanita_amarilla",
       "parent": 79,
       "tt": 1,
       "tp": 3,
@@ -16700,7 +16712,7 @@
       "ks": {
         "o": {
           "a": 0,
-          "k": 100,
+          "k": 1,
           "ix": 11
         },
         "r": {
@@ -21840,8 +21852,8 @@
       "ddd": 0,
       "ind": 77,
       "ty": 4,
-      "nm": ".Manzanita_Verde",
-      "cl": "Manzanita_Verde",
+      "nm": ".opacidad_manzanita_verde",
+      "cl": "opacidad_manzanita_verde",
       "parent": 79,
       "tt": 1,
       "tp": 3,
@@ -21849,7 +21861,7 @@
       "ks": {
         "o": {
           "a": 0,
-          "k": 100,
+          "k": 1,
           "ix": 11
         },
         "r": {
@@ -26709,8 +26721,8 @@
       "ddd": 0,
       "ind": 78,
       "ty": 4,
-      "nm": ".Manzanita_Roja",
-      "cl": "Manzanita_Roja",
+      "nm": ".opacidad_manzanita_roja",
+      "cl": "opacidad_manzanita_roja",
       "parent": 79,
       "tt": 1,
       "tp": 3,
@@ -26718,7 +26730,7 @@
       "ks": {
         "o": {
           "a": 0,
-          "k": 100,
+          "k": 1,
           "ix": 11
         },
         "r": {
