@@ -25237,7 +25237,7 @@
           "c": {
             "a": 0,
             "k": [
-              0.521568655968,
+              0.21568655968,
               0.854901969433,
               0,
               1
@@ -25251,8 +25251,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
-          "mn": "ADBE Vector Graphic - Fill",
+          "nm": ".color_sr_bolo1",
+          "cl": "color_sr_bolo1",
           "hd": false
         }
       ],
@@ -25357,7 +25357,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_sr_bolo2",
+          "cl": "color_sr_bolo2",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -25463,7 +25464,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_sr_bolo3",
+          "cl": "color_sr_bolo3",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -25569,7 +25571,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_sr_bolo4",
+          "cl": "color_sr_bolo4",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -25675,7 +25678,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_sr_bolo5",
+          "cl": "color_sr_bolo5",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -25780,7 +25784,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_lp_bolo1",
+          "cl": "color_lp_bolo1",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -25885,7 +25890,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_lp_bolo2",
+          "cl": "color_lp_bolo2",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -25990,7 +25996,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_lp_bolo3",
+          "cl": "color_lp_bolo3",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -26095,7 +26102,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_lp_bolo4",
+          "cl": "color_lp_bolo4",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -26200,7 +26208,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_ny_bolo1",
+          "cl": "color_ny_bolo1",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -26305,7 +26314,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_ny_bolo2",
+          "cl": "color_ny_bolo2",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -26410,7 +26420,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".color_ny_bolo3",
+          "cl": "color_ny_bolo3",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -104922,21 +104933,24 @@
       "st": 0,
       "ct": 1,
       "bm": 0
-    },
-    {
-      "ddd": 0,
-      "ind": 109,
-      "ty": 6,
-      "nm": "SFX OUT.mp3",
-      "cl": "mp3",
-      "refId": "audio_0",
-      "sr": 1,
-      "ip": 4.00000016292334,
-      "op": 62.7575127602474,
-      "st": 4.00000016292334,
-      "bm": 0
     }
   ],
-  "markers": [],
+  "markers": [
+    {
+      "tm": 0,
+      "cm": "play",
+      "dr": 300
+    },
+    {
+      "tm": 300,
+      "cm": "name:loop\r\nloopDelay: 1\r\nloopExternal: true",
+      "dr": 50
+    },
+    {
+      "tm": 550,
+      "cm": "stop",
+      "dr": 100
+    }
+  ],
   "props": {}
 }
