@@ -194,10 +194,10 @@ webcg.on('data', function (data) {
     console.log('data from casparcg received')
     console.log(JSON.stringify(data, null, 2));
     for (var key in data) {
-    if (key.includes("color")) {
+    if (key.toLowerCase().includes("color")) {
         checkandcolor(key, data[key]);
     }
-    if (key.includes("opacidad")) {
+    if (key.toLowerCase().includes("opacidad")) {
         checkandupdate(key, data[key]);
     }
 }
