@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <!--  template made by heine froholdt heine.froholdt@gmail.com  -->
+    <meta charset="UTF-8" />
+    <title>teleprompter</title>
+
+    <style>
+
+        body {
+            overflow: hidden;
+            margin: 0;
+            font-size: 80px;
+            text-align: center;
+            color: white;
+            background-color: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            width: 100vw;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        #text-container{
+            width: 80%;
+            max-width: 1200px;
+            margin-top: 25vh;
+            padding: 20px;
+            border-radius: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8),
+                         -2px -2px 4px rgba(0, 0, 0, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background-color: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+        }
+        .alert {
+            animation: blink 0.5s infinite alternate;
+            border: 10px solid red;
+          
+        }
+        @keyframes blink {
+            0% {opacity: 1;}
+            100% {opacity: 0.2;}
+        }
+    </style>
+</head>
+
+<body>
+    <div id="text-container">MODO ENSAYO</div>
+    
+    <script src="../webcg-framework.umd.js"></script>
+    <script>
+
+        webcg.on('data', function (data) {
+            console.log('new data')
+            if (data && data.texto && data.texto.trim() !== '') {
+                document.getElementById('text-container').style.display = "block";
+                document.getElementById('text-container').innerHTML = data['texto'];
+            } 
+        });
+        webcg.on('alert', function () {
+            console.log('alert')
+            let container = document.getElementById('text-container');
+            container.classList.toggle('alert');
+            setTimeout(() => {
+                container.classList.remove('alert');
+            }, 5000)
+        });
+         webcg.on('stop', function () {
+            console.log('stop') 
+                document.getElementById('text-container').style.display = "none";
+             
+            });
+    </script>
+
+
+    <!-- Scripts -->
+
+    
+</body>
+
+</html>

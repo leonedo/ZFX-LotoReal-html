@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>countdown</title>
+
+    <style>
+        body {
+            overflow: hidden;
+            margin: 0;
+            text-align: center;
+            color: white;
+            background-color: transparent;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        #text-container {
+            width: 100%;
+           height: 100%;
+          display: none;
+            background-color:black;
+           
+        }
+
+        #f0 {
+            font-size: 60px;   /* smaller text */
+            margin-bottom: 40px;
+        }
+
+        #f1 {
+            font-size: 120px;  /* larger text */
+            font-weight: bold;
+        }
+
+        .alert {
+            animation: blink 0.5s infinite alternate;
+            border: 10px solid red;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+    </style>
+</head>
+<body>
+   <div id="text-container">
+    <div id="f0">  </div>
+    <div id="f1">  </div>
+    </div>
+    
+    <script src="../webcg-framework.umd.js"></script>
+    <script>
+        webcg.on('data', function (data) {
+            console.log('new data');
+            document.getElementById('text-container').style.display = "block";
+            if (data['f0'] !== undefined) {
+                document.getElementById('f0').innerHTML = data['f0'];
+            }
+            if (data['f1'] !== undefined) {
+                document.getElementById('f1').innerHTML = data['f1'];
+            }
+        });
+
+        webcg.on('alert', function () {
+            console.log('alert');
+            let container = document.getElementById('f1'); // alert effect on big text (f1)
+            container.classList.toggle('alert');
+            setTimeout(() => {
+                container.classList.remove('alert');
+            }, 5000);
+        });
+
+        webcg.on('stop', function () {
+            console.log('stop') 
+             document.getElementById('text-container').style.display = "none";
+            });
+    </script>
+</body>
+</html>
