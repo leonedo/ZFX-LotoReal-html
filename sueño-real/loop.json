@@ -417,20 +417,6 @@
       "e": 0
     },
     {
-      "id": "audio_0",
-      "u": "../sequence/lower/images/",
-      "p": "aud_0.mp3",
-      "e": 0,
-      "t": 2
-    },
-    {
-      "id": "audio_1",
-      "u": "../sequence/lower/images/",
-      "p": "aud_1.mp3",
-      "e": 0,
-      "t": 2
-    },
-    {
       "id": "comp_0",
       "nm": "Sec",
       "fr": 29.9700012207031,
@@ -227005,19 +226991,19 @@
   ],
   "markers": [
     {
-      "tm":0,
-      "cm":"play",
-      "dr":100
+      "tm": 0,
+      "cm": "play",
+      "dr": 100
     },
     {
-      "tm":100,
-      "cm":"name:loop\r\nloopDelay: 0\r\nloopExternal: false",
-      "dr":100
+      "tm": 100,
+      "cm": "name:loop\r\nloopDelay: 0\r\nloopExternal: false",
+      "dr": 100
     },
     {
-      "tm":600,
-      "cm":"stop",
-      "dr":100
+      "tm": 600,
+      "cm": "stop",
+      "dr": 100
     }
   ],
   "props": {}
