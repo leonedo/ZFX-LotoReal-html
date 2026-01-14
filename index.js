@@ -375,6 +375,11 @@ webcg.on('entrada5', function () {
     anim.goToAndPlay('bola5', true);
 });
 
+webcg.on('entrada6', function () {
+    console.log('bola6')
+    anim.goToAndPlay('bola6', true);
+});
+
 
 webcg.on('play', function () {
     animPromise.then((resolve) => {

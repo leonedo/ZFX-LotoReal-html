@@ -2567,6 +2567,47 @@
       "bm": 0
     }
   ],
-  "markers": [],
+  "markers": [
+    {
+      "tm": 0,
+      "cm": "play",
+      "dr": 10
+    },
+    {
+      "tm": 50,
+      "cm": "bola1",
+      "dr": 73
+    },
+    {
+      "tm": 125,
+      "cm": "bola2",
+      "dr": 50
+    },
+    {
+      "tm": 170,
+      "cm": "bola3",
+      "dr": 50
+    },
+    {
+      "tm": 220,
+      "cm": "bola4",
+      "dr": 40
+    },
+    {
+      "tm": 260,
+      "cm": "bola5",
+      "dr": 40
+    },
+    {
+      "tm": 45,
+      "cm": "name:loop\r\nloopDelay: 1\r\nloopExternal: true",
+      "dr": 50
+    },
+    {
+      "tm": 610,
+      "cm": "stop",
+      "dr": 100
+    }
+  ],
   "props": {}
 }
