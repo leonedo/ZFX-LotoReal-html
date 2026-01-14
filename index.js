@@ -174,7 +174,7 @@ anim.addEventListener('config_ready', function (e) {
     })
 
     //Add fonts to style
-    if (!fontsLoaded) {
+    if (!fontsLoaded && anim.renderer.data.fonts) {
         let fonts = anim.renderer.data.fonts.list;
         for (const font in fonts) {
             let family = fonts[font].fFamily
