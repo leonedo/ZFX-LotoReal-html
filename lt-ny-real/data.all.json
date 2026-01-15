@@ -3409,7 +3409,7 @@
               "s": {
                 "s": 12,
                 "f": "Montserrat-SemiBold",
-                "t": "03",
+                "t": "",
                 "ca": 1,
                 "j": 2,
                 "tr": 0,
@@ -3505,7 +3505,7 @@
               "s": {
                 "s": 12,
                 "f": "Montserrat-SemiBold",
-                "t": "26",
+                "t": "",
                 "ca": 1,
                 "j": 2,
                 "tr": 0,
@@ -3601,7 +3601,7 @@
               "s": {
                 "s": 12,
                 "f": "Montserrat-SemiBold",
-                "t": "51",
+                "t": "",
                 "ca": 1,
                 "j": 2,
                 "tr": 0,
@@ -5921,8 +5921,8 @@
       "ddd": 0,
       "ind": 18,
       "ty": 4,
-      "nm": ".Manzanita_Amarilla 3",
-      "cl": "Manzanita_Amarilla",
+      "nm": ".manzanita_amarilla_opacidad",
+      "cl": "manzanita_amarilla_opacidad",
       "parent": 13,
       "tt": 1,
       "tp": 33,
@@ -5930,7 +5930,7 @@
       "ks": {
         "o": {
           "a": 0,
-          "k": 100,
+          "k": 1,
           "ix": 11
         },
         "r": {
@@ -11070,8 +11070,8 @@
       "ddd": 0,
       "ind": 19,
       "ty": 4,
-      "nm": ".Manzanita_Verde 3",
-      "cl": "Manzanita_Verde",
+      "nm": ".manzanita_verde_opacidad",
+      "cl": "manzanita_verde_opacidad",
       "parent": 13,
       "tt": 1,
       "tp": 33,
@@ -11079,7 +11079,7 @@
       "ks": {
         "o": {
           "a": 0,
-          "k": 100,
+          "k": 1,
           "ix": 11
         },
         "r": {
@@ -15939,8 +15939,8 @@
       "ddd": 0,
       "ind": 20,
       "ty": 4,
-      "nm": ".Manzanita_Roja 3",
-      "cl": "Manzanita_Roja",
+      "nm": ".manzanita_roja_opacidad",
+      "cl": "manzanita_roja_opacidad",
       "parent": 13,
       "tt": 1,
       "tp": 33,
@@ -15948,7 +15948,7 @@
       "ks": {
         "o": {
           "a": 0,
-          "k": 100,
+          "k": 1,
           "ix": 11
         },
         "r": {
@@ -22176,7 +22176,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".bola1Color",
+          "cl": "bola1Color",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -22283,7 +22284,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".bola2Color",
+          "cl": "bola2Color",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -22390,7 +22392,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".bola3Color",
+          "cl": "bola3Color",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -22497,7 +22500,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".bola4Color",
+          "cl": "bola4Color",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
@@ -262831,6 +262835,22 @@
       "bm": 0
     }
   ],
-  "markers": [],
+  "markers": [
+    {
+      "tm": 0,
+      "cm": "play",
+      "dr": 500
+    },
+    {
+      "tm": 500,
+      "cm": "loop",
+      "dr": 50
+    },
+    {
+      "tm": 620,
+      "cm": "stop",
+      "dr": 100
+    }
+  ],
   "props": {}
 }
