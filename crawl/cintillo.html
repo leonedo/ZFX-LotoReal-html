@@ -5,6 +5,7 @@
 
     <!--  template made by heine froholdt heine.froholdt@gmail.com  -->
     <meta charset="UTF-8" />
+    
     <title>Template</title>
 
     <style>
@@ -45,24 +46,6 @@
   transition: opacity 0.5s ease;
 }
 
-
-
-
-
-/* Inner text that scrolls 
-.ticker-text {
-  font-family: 'Montserrat-Bold', sans-serif;
-  font-weight: 700;
-  font-size: 44px;
-  line-height: 62px;
-  letter-spacing: 0;
-  color: rgb(38, 38, 38);
-  position: absolute;
-  white-space: nowrap;
-  animation: scroll 20s linear infinite;
-}
-*/
-
 .ticker-text {
   font-family: 'Montserrat-Bold', sans-serif;;
   position: absolute;
@@ -86,6 +69,7 @@
   }
 }
     </style>
+    <audio id="sfxOut" src="../audio/aud_0.mp3" preload="auto"></audio>
 </head>
 
 <body>
@@ -102,7 +86,10 @@
 
 
     <!-- Scripts -->
-    <script>let json_file = "cintillo.json" </script> 
+    <script>
+            let json_file = "cintillo.json" 
+            let audio_inframe = 5;
+    </script> 
     <script src="../webcg-framework.umd.js"></script>
     <script src="../lottie.js"></script>
     <script src="cintillo.js"></script>

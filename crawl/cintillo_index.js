@@ -292,3 +292,26 @@ webcg.on('update', function () {
 
     }
 });
+
+let sfxPlayed = false; // prevent it from playing multiple times
+
+
+anim.addEventListener('enterFrame', (e) => {
+    const currentFrame = e.currentTime;
+
+    // Play sound only if audio_inframe exists and is valid
+    if (
+        typeof audio_inframe === 'number' &&
+        !Number.isNaN(audio_inframe) &&
+        currentFrame >= audio_inframe &&
+        !sfxPlayed
+    ) {
+        const audio = document.getElementById('sfxOut');
+        if (audio) {
+            audio.volume = 1.0;
+            audio.currentTime = 0;
+            audio.play();
+            sfxPlayed = true;
+        }
+    }
+});
