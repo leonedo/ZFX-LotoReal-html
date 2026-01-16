@@ -400,7 +400,7 @@ webcg.on('stop', function () {
     loopAnimation = false;
     nextAnimation = 'stop'
 
-    if (anim.isPaused) {
+    //if (anim.isPaused) {
         if (!loopExternal) {
             anim.goToAndPlay('stop', true)
             isOn = false
@@ -411,7 +411,7 @@ webcg.on('stop', function () {
             anim.goToAndPlay('stop', true)
             isOn = false
         }
-    }
+   // }
 
 });
 
