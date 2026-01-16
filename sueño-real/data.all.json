@@ -417,20 +417,6 @@
       "e": 0
     },
     {
-      "id": "audio_0",
-      "u": "../sequence/lower/images/",
-      "p": "aud_0.mp3",
-      "e": 0,
-      "t": 2
-    },
-    {
-      "id": "audio_1",
-      "u": "../sequence/lower/images/",
-      "p": "aud_1.mp3",
-      "e": 0,
-      "t": 2
-    },
-    {
       "id": "comp_0",
       "nm": "Sec",
       "fr": 29.9700012207031,
@@ -231133,7 +231119,7 @@
       "cm": "play",
       "dr": 500
     },
-     {
+    {
       "tm": 500,
       "cm": "loop",
       "dr": 50

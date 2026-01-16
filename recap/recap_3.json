@@ -409,13 +409,6 @@
       "e": 0
     },
     {
-      "id": "audio_0",
-      "u": "../sequence/full/images/",
-      "p": "aud_0.mp3",
-      "e": 0,
-      "t": 2
-    },
-    {
       "id": "comp_0",
       "nm": "Transition",
       "fr": 29.9700012207031,

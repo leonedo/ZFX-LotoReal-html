@@ -7,22 +7,7 @@
   "h": 1080,
   "nm": "LoteriaReal_LR",
   "ddd": 0,
-  "assets": [
-    {
-      "id": "audio_0",
-      "u": "images/",
-      "p": "aud_0.mp3",
-      "e": 0,
-      "t": 2
-    },
-    {
-      "id": "audio_1",
-      "u": "images/",
-      "p": "aud_1.mp3",
-      "e": 0,
-      "t": 2
-    }
-  ],
+  "assets": [],
   "fonts": {
     "list": [
       {
@@ -96,8 +81,8 @@
       "ddd": 0,
       "ind": 2,
       "ty": 5,
-      "nm": ".t0",
-      "cl": "t0",
+      "nm": ".bola1",
+      "cl": "bola1",
       "parent": 8,
       "tt": 1,
       "tp": 18,
@@ -192,8 +177,8 @@
       "ddd": 0,
       "ind": 3,
       "ty": 5,
-      "nm": ".t1",
-      "cl": "t1",
+      "nm": ".bola2",
+      "cl": "bola2",
       "parent": 9,
       "tt": 1,
       "tp": 18,
@@ -288,8 +273,8 @@
       "ddd": 0,
       "ind": 4,
       "ty": 5,
-      "nm": ".t2",
-      "cl": "t2",
+      "nm": ".bola3",
+      "cl": "bola3",
       "parent": 10,
       "tt": 1,
       "tp": 18,
@@ -2580,34 +2565,49 @@
       "st": 0,
       "ct": 1,
       "bm": 0
-    },
-    {
-      "ddd": 0,
-      "ind": 19,
-      "ty": 6,
-      "nm": "SFX OUT.mp3",
-      "cl": "mp3",
-      "refId": "audio_0",
-      "sr": 1,
-      "ip": 4.00000016292334,
-      "op": 62.7575127602474,
-      "st": 4.00000016292334,
-      "bm": 0
-    },
-    {
-      "ddd": 0,
-      "ind": 20,
-      "ty": 6,
-      "nm": "SFX OUT.mp3",
-      "cl": "mp3",
-      "refId": "audio_1",
-      "sr": 1,
-      "ip": 623.00002537531,
-      "op": 681.757537972634,
-      "st": 623.00002537531,
-      "bm": 0
     }
   ],
-  "markers": [],
+  "markers": [
+    {
+      "tm": 0,
+      "cm": "play",
+      "dr": 10
+    },
+    {
+      "tm": 50,
+      "cm": "bola1",
+      "dr": 73
+    },
+    {
+      "tm": 125,
+      "cm": "bola2",
+      "dr": 50
+    },
+    {
+      "tm": 170,
+      "cm": "bola3",
+      "dr": 50
+    },
+    {
+      "tm": 220,
+      "cm": "bola4",
+      "dr": 40
+    },
+    {
+      "tm": 260,
+      "cm": "bola5",
+      "dr": 40
+    },
+    {
+      "tm": 45,
+      "cm": "name:loop\r\nloopDelay: 1\r\nloopExternal: true",
+      "dr": 50
+    },
+    {
+      "tm": 610,
+      "cm": "stop",
+      "dr": 100
+    }
+  ],
   "props": {}
 }

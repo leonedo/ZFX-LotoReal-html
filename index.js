@@ -174,7 +174,7 @@ anim.addEventListener('config_ready', function (e) {
     })
 
     //Add fonts to style
-    if (!fontsLoaded) {
+    if (!fontsLoaded && anim.renderer.data.fonts) {
         let fonts = anim.renderer.data.fonts.list;
         for (const font in fonts) {
             let family = fonts[font].fFamily
@@ -373,6 +373,11 @@ webcg.on('entrada4', function () {
 webcg.on('entrada5', function () {
     console.log('bola5')
     anim.goToAndPlay('bola5', true);
+});
+
+webcg.on('entrada6', function () {
+    console.log('bola6')
+    anim.goToAndPlay('bola6', true);
 });
 
 
