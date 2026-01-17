@@ -458,3 +458,55 @@ anim.addEventListener('enterFrame', (e) => {
         }
     }
 });
+
+
+
+// clock and date formatters
+const ENABLE_CLOCK = window.ENABLE_CLOCK === true;
+
+const timeFormatter = new Intl.DateTimeFormat('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+});
+
+const dateFormatter = new Intl.DateTimeFormat('es-DO', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+});
+
+function updateLottieText(className, text) {
+    for (let i = 0; i < anim.renderer.elements.length; i++) {
+        const el = anim.renderer.elements[i];
+
+        if (
+            el.data &&
+            el.data.cl === className &&
+            typeof el.updateDocumentData === 'function'
+        ) {
+            try {
+                el.canResizeFont(true);
+                el.updateDocumentData({ t: text }, 0);
+            } catch (e) {
+                console.log('[Clock] Failed to update', className, e);
+            }
+            return;
+        }
+    }
+}
+
+function updateClock() {
+    const now = new Date();
+    updateLottieText('time', timeFormatter.format(now));
+    updateLottieText('date', dateFormatter.format(now));
+}
+
+animPromise.then(() => {
+    if (!ENABLE_CLOCK) {
+        return;
+    }
+
+    updateClock();
+    setInterval(updateClock, 10 * 1000);
+});
