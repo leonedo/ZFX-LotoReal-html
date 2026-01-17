@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>teleprompter</title>
+    <title>Slate</title>
 
     <style>
         body {
@@ -40,12 +41,20 @@
 
         #f1 {
             font-size: 80px;    /* bottom text */
+            
+        }
+
+        #modo {
+            margin-top: 10px;
+            font-size: 120px;    /* bottom text */
+            margin-bottom: 100px;
+            color: yellow;
         }
 
         .alert {
             animation: blink 0.5s infinite alternate;
-            border: 10px solid red;
-            padding: 20px;
+            outline: 10px solid red;
+            outline-offset: -10px; /* optional, pulls it inward */
             border-radius: 10px;
         }
 
@@ -57,10 +66,15 @@
 </head>
 <body>
     <div id="text-container">
+        
+         <div id="modo"> </div>
         <div id="f0">  </div>
         <div id="date"></div>
         <div id="f1">  </div>
+
+       
     </div>
+    
     
     <script src="../webcg-framework.umd.js"></script>
     <script>
@@ -84,12 +98,15 @@
             if (data['f1'] !== undefined) {
                 document.getElementById('f1').innerHTML = data['f1'];
             }
+            if (data['modo'] !== undefined) {
+                document.getElementById('modo').innerHTML = data['modo'];
+            }
         });
 
         // --- Alert handler ---
         webcg.on('alert', function () {
             console.log('alert');
-            let container = document.getElementById('f0'); // alert only on f0
+            let container = document.getElementById('modo'); // alert only on f0
             container.classList.toggle('alert');
             setTimeout(() => {
                 container.classList.remove('alert');
