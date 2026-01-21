@@ -381,6 +381,14 @@ webcg.on('entrada6', function () {
 });
 
 
+webcg.on('startclock', function () {
+   startClock();
+});
+
+webcg.on('stopclock', function () {
+    stopClock();
+});
+
 webcg.on('play', function () {
     animPromise.then((resolve) => {
         console.log('play')
@@ -463,6 +471,9 @@ anim.addEventListener('enterFrame', (e) => {
 
 // clock and date formatters
 const ENABLE_CLOCK = window.ENABLE_CLOCK === true;
+let clockInterval = null;
+let clockEnabled = false;
+
 
 const timeFormatter = new Intl.DateTimeFormat('en-US', {
     hour: '2-digit',
@@ -502,11 +513,32 @@ function updateClock() {
     updateLottieText('date', dateFormatter.format(now));
 }
 
+function startClock() {
+    if (clockEnabled) return;
+
+    clockEnabled = true;
+    updateClock();
+    clockInterval = setInterval(updateClock, 10 * 1000);
+}
+
+function stopClock() {
+    clockEnabled = false;
+
+    if (clockInterval) {
+        clearInterval(clockInterval);
+        clockInterval = null;
+    }
+
+    // Clear text (hide)
+    updateLottieText('time', '');
+    updateLottieText('date', '');
+}
+
+
 animPromise.then(() => {
     if (!ENABLE_CLOCK) {
         return;
     }
-
-    updateClock();
-    setInterval(updateClock, 10 * 1000);
+    startClock();
+   
 });
