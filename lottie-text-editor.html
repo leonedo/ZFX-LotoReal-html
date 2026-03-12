@@ -55,20 +55,6 @@
             border-radius: 8px;
         }
 
-        .file-input-wrapper {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-        }
-
-        input[type="file"] {
-            position: absolute;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-
         .file-input-label {
             display: block;
             padding: 15px 20px;
@@ -91,6 +77,17 @@
             border-radius: 4px;
             font-size: 14px;
             color: #666;
+        }
+
+        .same-file-hint {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #28a745;
+        }
+
+        #openFileBtn {
+            cursor: pointer;
+            font: inherit;
         }
 
         .layers-section {
@@ -339,6 +336,17 @@
             border-left: none;
         }
 
+        .layer-values-display {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .layer-values-display span {
+            margin-right: 12px;
+        }
+
         /* Modal Styles */
         .modal {
             display: none;
@@ -472,13 +480,10 @@
 
         <div class="content">
             <div class="file-section">
-                <div class="file-input-wrapper">
-                    <input type="file" id="fileInput" accept=".json" />
-                    <label for="fileInput" class="file-input-label">
-                        📁 Choose Lottie JSON File
-                    </label>
-                </div>
+                <input type="file" id="fileInput" accept=".json" style="display: none;" />
+                <button type="button" class="file-input-label" id="openFileBtn">📁 Choose Lottie JSON File</button>
                 <div id="fileName" class="file-name" style="display: none;"></div>
+                <p id="sameFileHint" class="same-file-hint" style="display: none;">Saving will write to this same file (no dialog).</p>
             </div>
 
             <div id="layersSection" class="layers-section" style="display: none;">
@@ -493,6 +498,20 @@
                     <span id="selectedCount" style="margin-left: auto; padding: 8px 16px; background: #e7f3ff; color: #0066cc; border-radius: 6px; font-size: 14px; font-weight: 600;">0 selected</span>
                 </div>
                 <div id="layersList" class="layers-list"></div>
+
+                <div id="fillsSection" class="fills-section" style="display: none;">
+                    <div class="layers-header" style="margin-top: 24px;">
+                        <h2>Color fill layers</h2>
+                        <span id="fillsCount" class="layers-count">0 fills</span>
+                    </div>
+                    <div class="select-all-actions">
+                        <button class="btn-primary btn-small" onclick="selectAllFills()">✓ Select All</button>
+                        <button class="btn-secondary btn-small" onclick="deselectAllFills()">✗ Deselect All</button>
+                        <span id="selectedFillsCount" style="margin-left: auto; padding: 8px 16px; background: #e7f3ff; color: #0066cc; border-radius: 6px; font-size: 14px; font-weight: 600;">0 selected</span>
+                    </div>
+                    <div id="fillsList" class="layers-list"></div>
+                </div>
+
                 <div class="actions">
                     <button class="btn-success" onclick="saveFile()">💾 Save Changes</button>
                     <button class="btn-secondary" onclick="resetFile()">🔄 Reset</button>
@@ -538,22 +557,58 @@
         let lottieData = null;
         let originalData = null;
         let fileName = '';
+        let fileHandle = null; // File System Access API handle — when set, Save writes to same file
         let selectedLayers = new Set(); // Track which layers are selected
+        let selectedFills = new Set(); // Keys "layerIndex,shapeIndex" for color fills to save
+
+        async function openFile() {
+            if (typeof window.showOpenFilePicker !== 'undefined') {
+                try {
+                    const [handle] = await window.showOpenFilePicker({
+                        types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
+                        multiple: false,
+                        mode: 'readwrite'
+                    });
+                    fileHandle = handle;
+                    const file = await handle.getFile();
+                    fileName = file.name;
+                    document.getElementById('fileName').textContent = '📄 ' + file.name;
+                    document.getElementById('fileName').style.display = 'block';
+                    document.getElementById('sameFileHint').style.display = 'block';
+                    const text = await file.text();
+                    lottieData = JSON.parse(text);
+                    originalData = JSON.parse(JSON.stringify(lottieData));
+                    loadTextLayers();
+                    loadColorFillLayers();
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        alert('Error opening file: ' + (err.message || String(err)));
+                    }
+                }
+                return;
+            }
+            document.getElementById('fileInput').click();
+        }
+
+        document.getElementById('openFileBtn').addEventListener('click', openFile);
 
         document.getElementById('fileInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
+            fileHandle = null; // fallback: no handle, save will trigger download
+            document.getElementById('sameFileHint').style.display = 'none';
 
             fileName = file.name;
-            document.getElementById('fileName').textContent = `📄 ${file.name}`;
+            document.getElementById('fileName').textContent = '📄 ' + file.name;
             document.getElementById('fileName').style.display = 'block';
 
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     lottieData = JSON.parse(e.target.result);
-                    originalData = JSON.parse(JSON.stringify(lottieData)); // Deep copy
+                    originalData = JSON.parse(JSON.stringify(lottieData));
                     loadTextLayers();
+                    loadColorFillLayers();
                 } catch (error) {
                     alert('Error parsing JSON file: ' + error.message);
                 }
@@ -567,32 +622,24 @@
                 return;
             }
 
-            const textLayers = lottieData.layers.filter(layer => layer.ty === 5);
-            
-            if (textLayers.length === 0) {
-                alert('No text layers found in this file');
-                return;
-            }
-
             document.getElementById('emptyState').style.display = 'none';
             document.getElementById('layersSection').style.display = 'block';
+
+            const textLayers = lottieData.layers.filter(layer => layer.ty === 5);
             document.getElementById('layersCount').textContent = `${textLayers.length} layer${textLayers.length !== 1 ? 's' : ''}`;
 
             const layersList = document.getElementById('layersList');
             layersList.innerHTML = '';
-            
-            // Reset selected layers and select all by default
-            selectedLayers.clear();
-            textLayers.forEach((layer, index) => {
-                const layerIndex = findLayerIndex(layer);
-                selectedLayers.add(layerIndex);
-            });
 
-            textLayers.forEach((layer, index) => {
-                const layerItem = createLayerItem(layer, index);
-                layersList.appendChild(layerItem);
-            });
-            
+            selectedLayers.clear();
+            if (textLayers.length > 0) {
+                textLayers.forEach((layer) => {
+                    selectedLayers.add(findLayerIndex(layer));
+                });
+                textLayers.forEach((layer, index) => {
+                    layersList.appendChild(createLayerItem(layer, index));
+                });
+            }
             updateSelectedCount();
         }
 
@@ -635,26 +682,18 @@
                     <span class="layer-index">Layer ${index + 1}</span>
                 </div>
                 <div class="layer-fields">
-                    <div class="field-group">
-                        <label>Layer Name (nm) <span class="info-badge">Auto-prefixed with "."</span></label>
-                        <div class="name-input-wrapper">
-                            <span class="name-prefix">.</span>
-                            <input type="text" 
-                                   class="layer-name-input" 
-                                   value="${escapeHtml(nameWithoutDot)}" 
-                                   placeholder="bola1"
-                                   ${!isSelected ? 'disabled' : ''}
-                                   onchange="updateLayerName(${layerIndex}, this.value)">
-                        </div>
-                    </div>
-                    <div class="field-group">
-                        <label>Class Name (cl)</label>
+                    <div class="field-group full-width">
+                        <label>Name / Class <span class="info-badge">One field updates both (nm gets "." prefix)</span></label>
                         <input type="text" 
-                               class="layer-class-input" 
+                               class="layer-name-class-input" 
                                value="${escapeHtml(currentCl)}" 
                                placeholder="bola1"
                                ${!isSelected ? 'disabled' : ''}
-                               onchange="updateLayerClass(${layerIndex}, this.value)">
+                               onchange="updateLayerNameAndClass(${layerIndex}, this.value)">
+                        <div class="layer-values-display">
+                            <span>nm: <strong>${escapeHtml((layer.nm || '').startsWith('.') ? layer.nm : '.' + (layer.nm || ''))}</strong></span>
+                            <span>cl: <strong>${escapeHtml(layer.cl || nameWithoutDot)}</strong></span>
+                        </div>
                     </div>
                     <div class="field-group full-width">
                         <label>Text Content</label>
@@ -698,7 +737,7 @@
         }
 
         function selectAllLayers() {
-            document.querySelectorAll('.layer-item').forEach(item => {
+            document.querySelectorAll('.layer-item[data-layer-index]').forEach(item => {
                 const layerIndex = parseInt(item.dataset.layerIndex);
                 selectedLayers.add(layerIndex);
                 item.classList.remove('deselected');
@@ -712,7 +751,7 @@
         }
 
         function deselectAllLayers() {
-            document.querySelectorAll('.layer-item').forEach(item => {
+            document.querySelectorAll('.layer-item[data-layer-index]').forEach(item => {
                 const layerIndex = parseInt(item.dataset.layerIndex);
                 selectedLayers.delete(layerIndex);
                 item.classList.add('deselected');
@@ -727,43 +766,166 @@
 
         function updateSelectedCount() {
             const count = selectedLayers.size;
-            const total = document.querySelectorAll('.layer-item').length;
+            const total = document.querySelectorAll('.layer-item[data-layer-index]').length;
             document.getElementById('selectedCount').textContent = `${count} of ${total} selected`;
         }
 
-        function updateLayerName(layerIndex, newName) {
+        function loadColorFillLayers() {
+            if (!lottieData || !lottieData.layers) return;
+
+            const fills = [];
+            lottieData.layers.forEach((layer, layerIndex) => {
+                if (layer.ty !== 4 || !layer.shapes || !Array.isArray(layer.shapes)) return;
+                const nm = (layer.nm || '').toLowerCase();
+                const cl = (layer.cl || '').toLowerCase();
+                if (!nm.includes('color') && !cl.includes('color')) return;
+                layer.shapes.forEach((shape, shapeIndex) => {
+                    if (shape.ty === 'fl') {
+                        fills.push({ layerIndex, shapeIndex, layer, shape });
+                    }
+                });
+            });
+
+            const fillsSection = document.getElementById('fillsSection');
+            const fillsList = document.getElementById('fillsList');
+            const fillsCountEl = document.getElementById('fillsCount');
+
+            if (fills.length === 0) {
+                fillsSection.style.display = 'none';
+                return;
+            }
+
+            fillsSection.style.display = 'block';
+            fillsCountEl.textContent = `${fills.length} fill${fills.length !== 1 ? 's' : ''}`;
+            fillsList.innerHTML = '';
+
+            selectedFills.clear();
+            fills.forEach(({ layerIndex, shapeIndex }) => {
+                selectedFills.add(`${layerIndex},${shapeIndex}`);
+            });
+
+            fills.forEach(({ layerIndex, shapeIndex, layer, shape }) => {
+                fillsList.appendChild(createFillCard(layerIndex, shapeIndex, layer, shape));
+            });
+            updateFillSelectedCount();
+        }
+
+        function createFillCard(layerIndex, shapeIndex, layer, shape) {
+            const key = `${layerIndex},${shapeIndex}`;
+            const isSelected = selectedFills.has(key);
+            const currentCl = shape.cl || (shape.nm || '').replace(/^\.+/, '').trim();
+            const displayNm = (shape.nm || '').startsWith('.') ? shape.nm : (shape.nm ? '.' + shape.nm : '');
+            const layerName = layer.nm || layer.cl || 'Layer ' + layerIndex;
+
+            const item = document.createElement('div');
+            item.className = 'layer-item fill-item';
+            item.dataset.fillKey = key;
+            if (!isSelected) item.classList.add('deselected');
+
+            item.innerHTML = `
+                <div class="layer-header">
+                    <div class="layer-checkbox-wrapper">
+                        <input type="checkbox" id="fill-checkbox-${key.replace(',', '-')}" ${isSelected ? 'checked' : ''}
+                               onchange="toggleFillSelection('${key}', this.checked)">
+                        <label for="fill-checkbox-${key.replace(',', '-')}" class="layer-checkbox-label">Edit this fill</label>
+                    </div>
+                    <span class="layer-index">Layer: ${escapeHtml(layerName)}</span>
+                </div>
+                <div class="layer-fields">
+                    <div class="field-group full-width">
+                        <label>Fill name / Class <span class="info-badge">One field updates both (nm gets "." prefix)</span></label>
+                        <input type="text" class="fill-name-class-input" value="${escapeHtml(currentCl)}" placeholder="bola4Color"
+                               ${!isSelected ? 'disabled' : ''} onchange="updateFillNameAndClass(${layerIndex}, ${shapeIndex}, this.value)">
+                        <div class="layer-values-display fill-values-display">
+                            <span>nm: <strong>${escapeHtml(displayNm || '(none)')}</strong></span>
+                            <span>cl: <strong>${escapeHtml(shape.cl || currentCl || '(none)')}</strong></span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return item;
+        }
+
+        function toggleFillSelection(key, isSelected) {
+            const item = document.querySelector(`[data-fill-key="${key}"]`);
+            if (!item) return;
+            if (isSelected) {
+                selectedFills.add(key);
+                item.classList.remove('deselected');
+                item.querySelectorAll('input').forEach(input => { input.disabled = false; });
+            } else {
+                selectedFills.delete(key);
+                item.classList.add('deselected');
+                item.querySelectorAll('input').forEach(input => { input.disabled = true; });
+            }
+            updateFillSelectedCount();
+        }
+
+        function selectAllFills() {
+            document.querySelectorAll('.fill-item').forEach(item => {
+                const key = item.dataset.fillKey;
+                selectedFills.add(key);
+                item.classList.remove('deselected');
+                const cb = item.querySelector('input[type="checkbox"]');
+                if (cb) cb.checked = true;
+                item.querySelectorAll('.fill-name-class-input').forEach(input => { input.disabled = false; });
+            });
+            updateFillSelectedCount();
+        }
+
+        function deselectAllFills() {
+            document.querySelectorAll('.fill-item').forEach(item => {
+                const key = item.dataset.fillKey;
+                selectedFills.delete(key);
+                item.classList.add('deselected');
+                const cb = item.querySelector('input[type="checkbox"]');
+                if (cb) cb.checked = false;
+                item.querySelectorAll('.fill-name-class-input').forEach(input => { input.disabled = true; });
+            });
+            updateFillSelectedCount();
+        }
+
+        function updateFillSelectedCount() {
+            const count = selectedFills.size;
+            const total = document.querySelectorAll('.fill-item').length;
+            document.getElementById('selectedFillsCount').textContent = `${count} of ${total} selected`;
+        }
+
+        function updateFillNameAndClass(layerIndex, shapeIndex, value) {
+            const key = `${layerIndex},${shapeIndex}`;
+            if (!selectedFills.has(key)) return;
+            const layer = lottieData.layers[layerIndex];
+            if (!layer || !layer.shapes || !layer.shapes[shapeIndex]) return;
+            const shape = layer.shapes[shapeIndex];
+            const base = (value || '').replace(/^\.+/, '').trim();
+            shape.nm = base ? '.' + base : '';
+            shape.cl = base;
+
+            const item = document.querySelector(`[data-fill-key="${key}"]`);
+            if (item) {
+                const display = item.querySelector('.fill-values-display');
+                if (display) {
+                    display.innerHTML = `<span>nm: <strong>${escapeHtml(shape.nm)}</strong></span><span>cl: <strong>${escapeHtml(shape.cl)}</strong></span>`;
+                }
+            }
+        }
+
+        function updateLayerNameAndClass(layerIndex, value) {
             if (!selectedLayers.has(layerIndex)) return;
             
             const layer = lottieData.layers[layerIndex];
             if (!layer) return;
 
-            // Ensure name starts with dot
-            const nameWithDot = newName.startsWith('.') ? newName : '.' + newName;
-            layer.nm = nameWithDot;
+            const base = (value || '').replace(/^\.+/, '').trim();
+            layer.nm = base ? '.' + base : '';
+            layer.cl = base;
 
-            // Auto-update class if it doesn't exist or matches the old name pattern
-            const oldNameWithoutDot = (layer.nm || '').replace(/^\./, '');
-            if (!layer.cl || layer.cl === oldNameWithoutDot) {
-                layer.cl = newName;
-                // Update the class input field
-                const layerItem = document.querySelector(`[data-layer-index="${layerIndex}"]`);
-                if (layerItem) {
-                    const classInput = layerItem.querySelector('.layer-class-input');
-                    if (classInput) {
-                        classInput.value = newName;
-                    }
+            const layerItem = document.querySelector(`[data-layer-index="${layerIndex}"]`);
+            if (layerItem) {
+                const display = layerItem.querySelector('.layer-values-display');
+                if (display) {
+                    display.innerHTML = `<span>nm: <strong>${escapeHtml(layer.nm)}</strong></span><span>cl: <strong>${escapeHtml(layer.cl)}</strong></span>`;
                 }
-            }
-        }
-
-        function updateLayerClass(layerIndex, newClass) {
-            if (!selectedLayers.has(layerIndex)) return;
-            
-            const layer = lottieData.layers[layerIndex];
-            if (layer) {
-                // If class is empty, use the name (without dot) as default
-                const nameWithoutDot = (layer.nm || '').replace(/^\./, '');
-                layer.cl = newClass || nameWithoutDot;
             }
         }
 
@@ -782,21 +944,21 @@
             }
         }
 
-        function saveFile() {
+        async function saveFile() {
             if (!lottieData) {
                 alert('No file loaded');
                 return;
             }
 
-            if (selectedLayers.size === 0) {
-                alert('Please select at least one layer to edit');
+            if (selectedLayers.size === 0 && selectedFills.size === 0) {
+                alert('Please select at least one text layer or fill to edit');
                 return;
             }
 
             // Create a copy of the original data
             const dataToSave = JSON.parse(JSON.stringify(originalData));
             
-            // Only update selected layers
+            // Only update selected text layers
             selectedLayers.forEach(layerIndex => {
                 const originalLayer = lottieData.layers[layerIndex];
                 const targetLayer = dataToSave.layers[layerIndex];
@@ -825,7 +987,38 @@
                 }
             });
 
+            // Apply selected fill nm/cl updates
+            selectedFills.forEach(key => {
+                const [layerIndex, shapeIndex] = key.split(',').map(Number);
+                const srcLayer = lottieData.layers[layerIndex];
+                const dstLayer = dataToSave.layers[layerIndex];
+                if (!srcLayer || !dstLayer || !srcLayer.shapes || !dstLayer.shapes) return;
+                const srcShape = srcLayer.shapes[shapeIndex];
+                const dstShape = dstLayer.shapes[shapeIndex];
+                if (srcShape && dstShape) {
+                    dstShape.nm = srcShape.nm;
+                    dstShape.cl = srcShape.cl;
+                }
+            });
+
             const jsonString = JSON.stringify(dataToSave, null, 2);
+            const layerCount = selectedLayers.size;
+            const fillCount = selectedFills.size;
+            const msg = [layerCount && `${layerCount} layer(s)`, fillCount && `${fillCount} fill(s)`].filter(Boolean).join(', ') + ' updated.';
+
+            if (fileHandle) {
+                try {
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(jsonString);
+                    await writable.close();
+                    alert(`Saved to ${fileName}. ${msg}`);
+                } catch (err) {
+                    alert('Could not write to file: ' + (err.message || String(err)));
+                }
+                return;
+            }
+
+            // Fallback: no file handle — trigger download (user picks location)
             const blob = new Blob([jsonString], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -834,9 +1027,7 @@
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            alert(`File saved successfully! ${selectedLayers.size} layer(s) were updated.`);
+            setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
         }
 
         function resetFile() {
@@ -848,7 +1039,9 @@
             if (confirm('Are you sure you want to reset all changes?')) {
                 lottieData = JSON.parse(JSON.stringify(originalData));
                 selectedLayers.clear();
+                selectedFills.clear();
                 loadTextLayers();
+                loadColorFillLayers();
             }
         }
 

@@ -799,7 +799,8 @@
           },
           "r": 1,
           "bm": 0,
-          "nm": "Fill 1",
+          "nm": ".bola1Color",
+          "cl": "bola1Color",
           "mn": "ADBE Vector Graphic - Fill",
           "hd": false
         }
