@@ -21419,14 +21419,14 @@
       "dr": 300
     },
     {
+      "tm": 300,
+      "cm": "name:loop\r\nloopDelay: 1\r\nloopExternal: true",
+      "dr": 50
+    },
+    {
       "tm": 650,
       "cm": "stop",
       "dr": 100
-    },
-    {
-      "tm": 300,
-      "dr": 50,
-      "cm": "name:loop\nloopDelay: 1\nloopExternal: true"
     }
   ],
   "props": {}
