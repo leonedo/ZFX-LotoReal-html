@@ -25,7 +25,10 @@
             height: 100%;
             display: none;
             background-color:black;
-           
+          
+            flex-direction: column;
+            justify-content: center; /* vertical center */
+            align-items: center;     /* horizontal center */
         }
         #f0 {
             font-size: 120px;   /* big top text */
@@ -67,13 +70,10 @@
 </head>
 <body>
     <div id="text-container">
-        
-         <div id="modo"> </div>
+       
         <div id="f0">  </div>
         <div id="date"></div>
         <div id="f1">  </div>
-
-       
     </div>
     
     
@@ -92,22 +92,20 @@
         // --- WebCG data updates ---
         webcg.on('data', function (data) {
             console.log('new data');
-            document.getElementById('text-container').style.display = "block";
+            document.getElementById('text-container').style.display = "flex";
             if (data['f0'] !== undefined) {
                 document.getElementById('f0').innerHTML = data['f0'];
             }
             if (data['f1'] !== undefined) {
                 document.getElementById('f1').innerHTML = data['f1'];
             }
-            if (data['modo'] !== undefined) {
-                document.getElementById('modo').innerHTML = data['modo'];
-            }
+            
         });
 
         // --- Alert handler ---
         webcg.on('alert', function () {
             console.log('alert');
-            let container = document.getElementById('modo'); // alert only on f0
+            let container = document.getElementById('f0'); // alert only on f0
             container.classList.toggle('alert');
             setTimeout(() => {
                 container.classList.remove('alert');
