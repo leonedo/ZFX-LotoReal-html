@@ -222,6 +222,7 @@ central.ks.s.k = [round(S * 100), round(S * 100), 100];
 
 // ---------------------------------------------------------------- 3. renombrar textos y colores
 
+let blanked = 0;
 const manifest = {
   games: {}, central: central.ind, center: CENTER, order: GAMES,
   baseScale: round(S * 100),
@@ -242,6 +243,13 @@ for (const game of GAMES) {
     renames.push(`${(l.cl || '·').padEnd(18)} → ${cl}`);
     l.cl = cl;
     l.nm = `.${cl}`;
+    // La entrega trae los números de la maqueta (75, 25, 50...). Si un juego sale al aire sin que
+    // le manden valores, esos números parecen resultados reales. Los recaps viejos vienen en
+    // blanco; se hace lo mismo.
+    for (const kf of l.t?.d?.k || []) {
+      if (kf.s) kf.s.t = '';
+      blanked++;
+    }
   });
 
   // Bolos planos → color_<juego>_bolo<N>. Los que traen grupo de brillo (Loto Real, Lotería, Tu Fecha)
@@ -250,10 +258,19 @@ for (const game of GAMES) {
     .map((l) => ({ l, x: worldOf(l, byInd).x }))
     .sort((a, b) => a.x - b.x);
 
+  // OJO: la clase va en el ítem de RELLENO, no en la capa. lottie le pone la clase de capa a un
+  // <g> y la de relleno al <path>; update_color() (index.js:312) escribe `style.fill` en lo que
+  // devuelva querySelector, y un style heredado por el <g> NO le gana al atributo `fill` que el
+  // <path> hijo trae puesto. Los recaps viejos que funcionan la tienen en shapes[].cl, en el `fl`.
+  // Poner las dos sería peor: el <g> va antes en el documento y querySelector se quedaría con él.
   balls.forEach(({ l }, i) => {
     const cl = `color_${game}_bolo${i + 1}`;
-    renames.push(`${(l.cl || '·').padEnd(18)} → ${cl}`);
-    l.cl = cl;
+    const fill = (l.shapes || []).find((s) => s.ty === 'fl');
+    if (!fill) {
+      die(`La capa ${l.ind} (${l.nm}) de "${game}" no tiene relleno donde poner ${cl}.`);
+    }
+    renames.push(`${(fill.cl || '·').padEnd(18)} → ${cl}`);
+    fill.cl = cl;
     l.nm = `.${cl}`;
   });
 
@@ -328,12 +345,17 @@ if (!doc.markers || doc.markers.length === 0) doc.markers = MARKERS;
 
 // Sólo las clases a las que el payload le escribe tienen que ser únicas — index.js las resuelve con
 // querySelector y se quedaría con la primera. Las decorativas (linea, FX_Bola…) se repiten a propósito.
-const isBound = (cl) => /^(?:\w+_bolo\d+|color_\w+|opacidad_\w+|logo_\w+|t_Resultados)$/.test(cl);
+const isBound = (cl) => /^(?:\w+_bolo\d+|color_\w+|opacidad_\w+|logo_\w+|t_resultados)$/i.test(cl);
 const seen = new Map();
+const claim = (cl, where) => {
+  if (!cl || !isBound(cl)) return;
+  if (seen.has(cl)) die(`Clase de datos duplicada "${cl}" (${seen.get(cl)} y ${where}).`);
+  seen.set(cl, where);
+};
 for (const l of layers) {
-  if (!l.cl || !isBound(l.cl)) continue;
-  if (seen.has(l.cl)) die(`Clase de datos duplicada "${l.cl}" (capas ${seen.get(l.cl)} y ${l.ind}).`);
-  seen.set(l.cl, l.ind);
+  claim(l.cl, `capa ${l.ind}`);
+  // las clases de color viven en el ítem de relleno, no en la capa
+  for (const sh of l.shapes || []) claim(sh.cl, `relleno de la capa ${l.ind}`);
 }
 
 const totalBolos = GAMES.reduce((n, g) => n + manifest.games[g].bolos, 0);
@@ -381,6 +403,7 @@ for (const g of GAMES) {
 console.log(`  ${'─'.repeat(58)}`);
 console.log(`  ${totalBolos} bolos · ${manzanitas} manzanitas · ${renames.length} clases renombradas`);
 console.log(`  track mattes quitados: ${mattesStripped} · capas de audio quitadas: ${audioLayers.length}`);
+console.log(`  textos de maqueta vaciados: ${blanked}`);
 console.log(`  markers: ${doc.markers.map((m) => (m.cm.split('\r')[0])).join(', ')}`);
 const rel = rel0;
 console.log(`\n  → ${rel(OUT_MASTER)}`);

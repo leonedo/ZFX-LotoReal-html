@@ -320,21 +320,27 @@ function normalizeValue(v) {
     return (typeof v === "object" && v !== null && "text" in v) ? v.text : v;
 } 
 
-function checkandcolor(item, colorData) {
+// Se reintenta porque la capa puede no estar todavía en el DOM cuando llega el dato. Pero si el
+// payload trae claves de un juego apagado, esa capa NO va a existir nunca (lottie ni la renderiza
+// cuando tiene hd:true), y sin tope el reintento seguía cada 100ms para siempre. Con un gráfico que
+// queda horas al aire eso es CPU quemada de gratis.
+const CHECK_RETRIES = 30; // 3 segundos
+
+function checkandcolor(item, colorData, tries) {
     const color = normalizeValue(colorData);
     if (itemExists(item)) {
         update_color(item, color);
-    } else {
-        setTimeout(() => checkandcolor(item, colorData), 100);
+    } else if ((tries || 0) < CHECK_RETRIES) {
+        setTimeout(() => checkandcolor(item, colorData, (tries || 0) + 1), 100);
     }
 }
 
-function checkandupdate(item, valueData) {
+function checkandupdate(item, valueData, tries) {
     const value = normalizeValue(valueData);
     if (itemExists(item)) {
         update_opacidad(item, value);
-    } else {
-        setTimeout(() => checkandupdate(item, valueData), 100);
+    } else if ((tries || 0) < CHECK_RETRIES) {
+        setTimeout(() => checkandupdate(item, valueData, (tries || 0) + 1), 100);
     }
 }
 function itemExists(item) {
@@ -385,10 +391,12 @@ webcg.on('entrada6', function () {
 
 
 webcg.on('startclock', function () {
+   if (!anim) return;
    startClock();
 });
 
 webcg.on('stopclock', function () {
+    if (!anim) return;
     stopClock();
 });
 
