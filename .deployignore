@@ -1,0 +1,43 @@
+# Qué NO copiar a los servers de playout.
+#
+#   rsync -a --delete --exclude-from=.deployignore ./ usuario@server:/ruta/ZFX-LotoReal-html/
+#
+# La lista se armó contra las 38 rutas que el controlador (repo LotoReal, FormaPrincipal.vb)
+# invoca con CG.Add, no adivinando: si algo no está acá, es porque alguna de esas rutas lo
+# carga. Antes de agregar una línea, comprobá que ninguna la use.
+#
+# Ojo al verificar: hay tres formas de referencia que no se ven grepeando ingenuamente.
+#   - host/index.html pide "host.json" y el archivo es "Host.json" (anda sólo en Windows).
+#   - crawl/cintillo.js nombra "crawl/Cintillo.json", relativo a la raíz del server.
+#   - macOS guarda los nombres en NFD, así que "sueño-real" no matchea contra git en NFC.
+
+# Material crudo del diseñador. Nada de producción lo referencia; son sus JSON los que
+# apuntan a recap-uni/images/. Se queda en el repo: es la referencia que permite comparar
+# una entrega nueva contra la anterior.
+New_aug_2026/
+
+# El controlador usa acumulado/index y nunca acumulado/resultado — de hecho no existe
+# acumulado/resultado.html. Es el único data.all.json del repo sin un HTML que lo cargue.
+acumulado/data.all.json
+
+# La entrega de marzo de Chance, guardada como referencia. Ningún HTML la nombra.
+lt-chance/loop_old.json
+
+# Backup con 50 referencias a imágenes que no existen.
+recap/recap_5.bk.json
+
+# Herramienta de desarrollo, ningún template la carga.
+webcg-devtools.umd.js
+
+.vscode/
+.DS_Store
+
+# --- Pendientes de decidir, NO excluidos todavía ---
+#
+# sueño-real/  (13.9 MB) — es el nombre viejo de Chance Real; el controlador lo dice en un
+#   comentario ("Chance Real, new name for old Sueno Real") y el botón despacha lt-chance/*.
+#   Ninguna ruta lo invoca. Queda por ahora en la misma categoría que recap/ y recaps/: plan
+#   de rollback. Excluilo cuando lt-chance esté confirmado en aire.
+#
+# recap-uni/  (38.1 MB) — el recap unificado. El controlador todavía no lo invoca, así que
+#   hoy es peso muerto en el server. En cuanto se le apunte una ruta, sacá esta nota.

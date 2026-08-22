@@ -122,6 +122,17 @@ editó a mano un archivo generado.
 Para retocar cómo se ve el gráfico **no hace falta reconstruir nada**: la tabla de layout vive en
 `recap-uni/recap-layout.js`.
 
+## Copiar a los servers
+
+```bash
+rsync -a --delete --exclude-from=.deployignore ./ usuario@server:/ruta/ZFX-LotoReal-html/
+```
+
+`.deployignore` saca ~70 MB de 366 que no carga ningún template. La lista se armó contra las **38
+rutas que el controlador invoca con `CG.Add`** (repo `leonedo/LotoReal`, `FormaPrincipal.vb`), no
+adivinando desde el repo. Si vas a agregarle una línea, comprobá contra esas rutas primero: hay tres
+referencias que no se ven grepeando ingenuamente, y están anotadas en el encabezado del archivo.
+
 ## Convenciones a respetar
 
 - **`index.js` está en CRLF.** Varios editores lo pasan a LF al guardar y eso convierte el diff en el
@@ -139,6 +150,9 @@ No son regresiones; si las tocás, que sea a propósito.
 
 - `host/index.html` pide `host.json` pero el archivo es `Host.json`. Anda en Windows, falla en
   cualquier sistema sensible a mayúsculas.
+- El controlador invoca dos templates que no existen acá, desde código **activo** (visto en
+  `LotoReal` v3.3.4): `autoridades/index_4` (sólo hay `index_1..3`) y `recaps/LP` (hay
+  `LP-LotoR.html`, no `LP.html`). Si esas dos salidas fallan en aire, es esto y no el template.
 - `crawl/cintillo.html` no usa `index.js` sino su propio motor (`cintillo.js`).
 - Un `UPDATE` que llega después de que la animación principal terminó su tramo de entrada escribe el
   dato pero no se re-renderiza hasta el próximo movimiento. Pasa igual en los recaps viejos.
