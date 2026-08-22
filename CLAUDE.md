@@ -71,6 +71,19 @@ await page.evaluate((f) => {
 
 Si no te interesa la transición, `await page.route('**/*.png', r => r.abort())` acelera bastante.
 
+`executablePath` tiene que apuntar al build que esté cacheado, y el `playwright` que instales tiene
+que ser el que pide **ese** build: si no coinciden, el launch falla pidiendo bajar navegadores. En
+macOS el cacheado vive en `~/Library/Caches/ms-playwright/chromium-<build>/chrome-mac-arm64/`, y el
+binario se llama `Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`.
+
+Para comparar contra el estado anterior **no hace falta `git stash`**: serví la versión de `HEAD` con
+un route, y el working tree queda como está.
+
+```js
+await page.route('**/data.json', (r) =>
+  r.fulfill({ contentType: 'application/json', body: headJson }));
+```
+
 ### Trampas al testear — todas costaron un bug que se escapó
 
 1. **Mandá el payload en el evento `load`, no después.** CasparCG lo manda apenas carga la página. Un
@@ -81,7 +94,16 @@ Si no te interesa la transición, `await page.route('**/*.png', r => r.abort())`
    Así se escapó que ninguno de los 13 bolos recoloreables respondía al payload.
 3. **No leas `textContent` de un bolo.** Arrastra glifos viejos ocultos: si el valor era `"100"` y
    mandás `"25"`, devuelve `"250"` aunque en pantalla se lea `25`. Medí por bounding box.
-4. **Afirmá, no mires.** Una captura que "se ve bien" no prueba nada; comparala contra un archivo de
+4. **El bounding box es el del grupo, no el del `<text>`.** lottie renderiza **un `<text>` por
+   glifo**: con `"25"` hay dos. `g.bola1 text` te devuelve sólo el `"2"` y parece que el template
+   trunca el payload. Medí `g.bola1`. Corolario: un assert de "sigue centrado" se hace sobre el
+   grupo — el centro de cada glifo suelto se corre, el del grupo no.
+5. **La `@font-face` la registra `fFamily`, no `fName`.** Un assert tipo
+   `[...document.fonts].some(f => f.family.includes("Montserrat-Medium"))` no matchea nunca: la
+   familia es `"Montserrat"` a secas. Para afirmar que llegó la fuente que querías, compará el
+   base64 que quedó inyectado en el `<style>` contra el del JSON, y usá `document.fonts.check()`
+   para descartar que haya caído a una del sistema.
+6. **Afirmá, no mires.** Una captura que "se ve bien" no prueba nada; comparala contra un archivo de
    referencia o contra un valor esperado.
 
 ## Reconstruir el recap unificado
