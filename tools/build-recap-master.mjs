@@ -111,6 +111,8 @@ const isFlatBall = (layer) => {
 
 const round = (n) => Math.round(n * 1000) / 1000;
 
+const rel0 = (p) => p.replace(`${ROOT}/`, '');
+
 // ---------------------------------------------------------------- carga
 
 let doc;
@@ -309,6 +311,15 @@ const audioLayers = layers.filter((l) => l.ty === 6);
 for (const l of audioLayers) layers.splice(layers.indexOf(l), 1);
 doc.assets = doc.assets.filter((a) => !String(a.p || '').toLowerCase().endsWith('.mp3'));
 
+// ---------------------------------------------------------------- 5c. rutas de los assets
+//
+// El template tiene que ser autocontenido: su carpeta `images/` al lado del JSON. El archivo de
+// entrada puede traer cualquier `u` (después de deduplicar las imágenes de la entrega, las suyas
+// apuntan a esta misma carpeta por un camino relativo largo), así que se normaliza siempre.
+for (const a of doc.assets) {
+  if (a.p) a.u = 'images/';
+}
+
 // ---------------------------------------------------------------- 6. markers
 
 if (!doc.markers || doc.markers.length === 0) doc.markers = MARKERS;
@@ -345,10 +356,15 @@ const fondo = JSON.parse(readFileSync(SRC_FONDO, 'utf8'));
 if (!fondo.markers || fondo.markers.length === 0) fondo.markers = MARKERS_FONDO;
 writeFileSync(OUT_FONDO, JSON.stringify(fondo));
 
-// La secuencia de transición vive en `images/` relativo al JSON. Es la misma en las cinco carpetas
-// de New_aug_2026 (mismo md5), así que acá queda la copia canónica y el template se vuelve portable.
+// La secuencia de transición vive en `images/` relativo al JSON. `recap-uni/images/` es la copia
+// canónica y va versionada, así que en un clon limpio ya está y no hay nada que copiar. La copia
+// sólo corre la primera vez, cuando todavía existe la carpeta original de la entrega — que después
+// se dedupe contra ésta justamente para no tener el mismo material dos veces.
 let copied = 'ya estaba';
 if (!existsSync(OUT_IMAGES)) {
+  if (!existsSync(SRC_IMAGES)) {
+    die(`Falta ${rel0(OUT_IMAGES)} y tampoco está la carpeta original en\n    ${rel0(SRC_IMAGES)}`);
+  }
   cpSync(SRC_IMAGES, OUT_IMAGES, { recursive: true });
   copied = 'copiada';
 }
@@ -366,7 +382,7 @@ console.log(`  ${'─'.repeat(58)}`);
 console.log(`  ${totalBolos} bolos · ${manzanitas} manzanitas · ${renames.length} clases renombradas`);
 console.log(`  track mattes quitados: ${mattesStripped} · capas de audio quitadas: ${audioLayers.length}`);
 console.log(`  markers: ${doc.markers.map((m) => (m.cm.split('\r')[0])).join(', ')}`);
-const rel = (p) => p.replace(`${ROOT}/`, '');
+const rel = rel0;
 console.log(`\n  → ${rel(OUT_MASTER)}`);
 console.log(`  → ${rel(OUT_MANIFEST)}`);
 console.log(`  → ${rel(OUT_FONDO)}  (fondo + markers)`);
