@@ -29,6 +29,10 @@ recap/recap_5.bk.json
 # Herramienta de desarrollo, ningún template la carga.
 webcg-devtools.umd.js
 
+# Documentación. Ningún template la carga: README.md, CLAUDE.md, los planes y el .md que deja
+# el editor de Lottie al lado de un JSON.
+*.md
+
 .vscode/
 .DS_Store
 
