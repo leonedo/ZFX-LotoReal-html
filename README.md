@@ -20,8 +20,8 @@ compartido.
 <script src="../index.js"></script>                <!-- el motor -->
 ```
 
-**`index.js` es el motor compartido por todos los templates.** Tocarlo afecta a todos: conviene
-verificar que los demás siguen cargando antes de commitear.
+**`index.js` es el motor compartido: lo cargan 39 páginas.** Tocarlo afecta a casi todo el aire;
+conviene verificar que los demás siguen cargando antes de commitear.
 
 ### Cómo llegan los datos
 
