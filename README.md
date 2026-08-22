@@ -63,10 +63,13 @@ Con `loopExternal: true`, el motor busca un **`loop.json` al lado del template**
 | `New_aug_2026/` | material crudo del diseñador; no se despliega |
 | `sequence/` | secuencias de transición compartidas |
 
-## Cómo debe venir un Lottie para que funque acá
+## Normalizar una entrega del diseñador
 
-Cosas que llegaron rotas en entregas reales y costaron tiempo. Vale la pena chequearlas antes de
-integrar un archivo nuevo:
+**El diseñador entrega siempre en crudo: el arte terminado, sin nada del cableado.** No es un
+descuido de una entrega puntual, es el formato normal de trabajo. Adaptarlo es un paso propio del
+proceso, no un rescate.
+
+Esto es lo que hay que resolver de este lado en cada entrega:
 
 1. **Markers `play` / `loop` / `stop`.** Sin ellos `goToAndPlay` falla y el gráfico no hace nada.
 2. **Nada de track mattes en capas que no pintan.** Un `tt`/`tp` sobre un null o una capa de audio
@@ -84,6 +87,10 @@ integrar un archivo nuevo:
    primera coincidencia; una clase repetida hace que la segunda nunca reciba nada.
 7. **Los valores de maqueta van en blanco.** Si un campo sale al aire sin dato, un número de relleno
    parece un resultado real.
+
+Este paso está automatizado del lado del equipo (hay MCP y skills propios que lo hacen); no hay que
+resolverlo a mano cada vez ni pedírselo al diseñador. `tools/build-recap-master.mjs` es la versión
+específica de ese proceso para el recap unificado.
 
 ## Notas
 

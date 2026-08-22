@@ -5,6 +5,26 @@ funciona un template, el despacho del payload y qué hay en cada carpeta; el
 **[README de recap-uni](recap-uni/README.md)** es el contrato del recap unificado. Esto de acá es sólo
 lo operativo: cómo correr las cosas, cómo verificarlas y qué no romper.
 
+## Cómo llega el material del diseñador
+
+**Siempre entrega en crudo: el arte terminado y nada más.** Sin markers, con los campos de texto
+numerados (`t0`, `t1`…) en vez de nombrados, sin las clases de color en los rellenos, con capas de
+audio embebidas y, a veces, con track mattes sobre nulls. Es el formato normal de trabajo, no el
+error de una entrega puntual.
+
+**Adaptarlo es un paso propio del proceso y ya está automatizado** con MCP y skills del equipo. Antes
+de escribir un script de normalización desde cero, preguntá cuál corresponde usar. No lo reportes
+como si fuera una sorpresa ni le pidas al diseñador que cambie cómo entrega: no va a pasar, y no
+hace falta.
+
+La lista de qué se normaliza está en el [README](README.md#normalizar-una-entrega-del-diseñador).
+`tools/build-recap-master.mjs` es la versión de ese proceso para el recap unificado.
+
+Corolario al comparar una entrega nueva contra lo que está en producción: **lo de producción suele
+estar mejor**, porque ya pasó por la normalización. Que el archivo nuevo esté "más crudo" no es razón
+para no integrarlo, pero tampoco lo es para reemplazar sin más: hay que mirar qué cambió de verdad en
+el arte y traer sólo eso.
+
 ## Radio de explosión
 
 **`index.js` lo cargan 39 páginas.** Es el motor compartido de casi todo el aire. Cualquier cambio ahí
