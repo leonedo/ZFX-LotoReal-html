@@ -58,12 +58,33 @@ const MARKERS = [
   { tm: 650, cm: 'stop', dr: 100 },
 ];
 
-/** Markers del fondo, que corre como loop externo. Copiados de recaps/loop.json. */
+/**
+ * Markers del fondo, que corre como loop externo. Copiados de recaps/loop.json.
+ *
+ * El `stop` no anima una salida: salta a un tramo de timeline donde ya no hay ninguna capa viva,
+ * y la pantalla queda limpia porque no queda nada que dibujar. Así que **tiene que caer después
+ * del `op` más alto de todas las capas**, no después del `op` de la composición.
+ *
+ * En `recaps/loop.json` los dos coincidían en 339 y el 500 sobraba. El fondo nuevo declara `op` 339
+ * igual, pero sus capas llegan hasta 866: con el `stop` en 500 quedaban 366 frames de fondo dibujado
+ * y la salida no limpiaba. Por eso se calcula acá abajo en vez de quedar fijo.
+ */
 const MARKERS_FONDO = [
   { tm: 0, cm: 'play', dr: 330 },
   { tm: 50, cm: 'name:loop\r\nloopDelay: 0\r\nloopExternal: false', dr: 280 },
-  { tm: 500, cm: 'stop', dr: 100 },
+  { tm: 500, cm: 'stop', dr: 100 }, // tm real: lo pisa stopLimpio() con el largo del fondo
 ];
+
+/**
+ * Devuelve los markers con el `stop` corrido a un frame sin capas vivas.
+ * Idempotente: si el `stop` ya estaba despejado, no lo mueve.
+ */
+const stopLimpio = (markers, layers) => {
+  const ultimaCapa = Math.max(...layers.map((L) => L.op ?? 0));
+  return markers.map((m) => (m.cm === 'stop' && m.tm <= ultimaCapa
+    ? { ...m, tm: Math.ceil(ultimaCapa / 10) * 10 + 30 }
+    : m));
+};
 
 // ---------------------------------------------------------------- helpers
 
@@ -375,7 +396,9 @@ writeFileSync(OUT_MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`);
 // El fondo va aparte y lo corre index.js como loop externo, que lo busca como `loop.json`
 // al lado del template. Viene sin markers igual que el maestro.
 const fondo = JSON.parse(readFileSync(SRC_FONDO, 'utf8'));
-if (!fondo.markers || fondo.markers.length === 0) fondo.markers = MARKERS_FONDO;
+if (!fondo.markers || fondo.markers.length === 0) {
+  fondo.markers = stopLimpio(MARKERS_FONDO, fondo.layers);
+}
 writeFileSync(OUT_FONDO, JSON.stringify(fondo));
 
 // La secuencia de transición vive en `images/` relativo al JSON. `recap-uni/images/` es la copia
