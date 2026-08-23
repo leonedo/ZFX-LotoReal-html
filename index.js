@@ -29,18 +29,20 @@ let animContainer = document.getElementById('bm');
 let loopContainer = document.getElementById('loop');
 
 
+// `data` puede ser una ruta (lo normal) o un objeto de animación ya armado en memoria,
+// que es como el recap unificado entrega su composición.
 const loadAnimation = (data, container) => {
-    console.log('loading ' + data)
-    return lottie.loadAnimation({
+    console.log('loading ' + (typeof data === 'string' ? data : '[animationData]'))
+    let source = typeof data === 'string' ? { path: data } : { animationData: data };
+    return lottie.loadAnimation(Object.assign({
         container: container,
         renderer: 'svg',
         loop: false,
-        autoplay: false,
-        path: data
-    });
+        autoplay: false
+    }, source));
 }
 
-let anim = loadAnimation(data_file, animContainer)
+let anim;
 let externalLoop;
 
 //add font-face from data.json  
@@ -57,18 +59,12 @@ const addFont = (fam, path) => {
 
 
 //checking if the animation is ready
-const makeAnimPromise = () => {
-    return new Promise(function (resolve, reject) {
-        if (animLoaded) {
-            resolve('Animation ready to play')
-        } else {
-            anim.addEventListener('DOMLoaded', function (e) {
-                animLoaded = true;
-                resolve('Animation ready to play')
-            });
-        }
-    })
-};
+// Se crea por adelantado, antes de que exista `anim`, para que los comandos de casparcg que lleguen
+// temprano (play, data) queden encolados contra ella y se apliquen apenas la animación esté lista.
+let resolveAnimPromise;
+const animPromise = new Promise(function (resolve) {
+    resolveAnimPromise = resolve;
+});
 
 
 const isMarker = (obj, keyItem, markerName) => {
@@ -104,7 +100,10 @@ const getMarkerValue = (obj, keyItem, defaultValue) => {
 
 
 //anim ready
-anim.addEventListener('config_ready', function (e) {
+let configReadyDone = false;
+function onConfigReady(e) {
+    if (configReadyDone) return;
+    configReadyDone = true;
     //setting the animation framerate
     let mainAnimation = anim.renderer.data
     framesMilliseconds = 1000 / mainAnimation.fr
@@ -185,9 +184,7 @@ anim.addEventListener('config_ready', function (e) {
         }
     }
 
-});
-
-const animPromise = makeAnimPromise()
+}
 
 webcg.on('data', function (data) {
     let updateTiming = 0
@@ -284,7 +281,7 @@ webcg.on('data', function (data) {
 
 
 //what to do everytime main animation is done playing
-anim.addEventListener('complete', () => {
+function onComplete() {
 
     if (loopAnimation && isOn && !loopExternal) {
         loopRepeat = setTimeout(() => {
@@ -304,7 +301,7 @@ anim.addEventListener('complete', () => {
 
         nextAnimation = 'no animation'
     }
-})
+}
 
 
 //Custom methods
@@ -323,21 +320,27 @@ function normalizeValue(v) {
     return (typeof v === "object" && v !== null && "text" in v) ? v.text : v;
 } 
 
-function checkandcolor(item, colorData) {
+// Se reintenta porque la capa puede no estar todavía en el DOM cuando llega el dato. Pero si el
+// payload trae claves de un juego apagado, esa capa NO va a existir nunca (lottie ni la renderiza
+// cuando tiene hd:true), y sin tope el reintento seguía cada 100ms para siempre. Con un gráfico que
+// queda horas al aire eso es CPU quemada de gratis.
+const CHECK_RETRIES = 30; // 3 segundos
+
+function checkandcolor(item, colorData, tries) {
     const color = normalizeValue(colorData);
     if (itemExists(item)) {
         update_color(item, color);
-    } else {
-        setTimeout(() => checkandcolor(item, colorData), 100);
+    } else if ((tries || 0) < CHECK_RETRIES) {
+        setTimeout(() => checkandcolor(item, colorData, (tries || 0) + 1), 100);
     }
 }
 
-function checkandupdate(item, valueData) {
+function checkandupdate(item, valueData, tries) {
     const value = normalizeValue(valueData);
     if (itemExists(item)) {
         update_opacidad(item, value);
-    } else {
-        setTimeout(() => checkandupdate(item, valueData), 100);
+    } else if ((tries || 0) < CHECK_RETRIES) {
+        setTimeout(() => checkandupdate(item, valueData, (tries || 0) + 1), 100);
     }
 }
 function itemExists(item) {
@@ -352,40 +355,48 @@ function itemExists(item) {
 
 webcg.on('entrada1', function () {
     console.log('bola1')
+    if (!anim) return;
     anim.goToAndPlay('bola1', true);
 });
 
 webcg.on('entrada2', function () {
     console.log('bola2')
+    if (!anim) return;
     anim.goToAndPlay('bola2', true);
 });
 
 webcg.on('entrada3', function () {
     console.log('bola3')
+    if (!anim) return;
     anim.goToAndPlay('bola3', true);
 });
 
 webcg.on('entrada4', function () {
     console.log('bola4')
+    if (!anim) return;
     anim.goToAndPlay('bola4', true);
 });
 
 webcg.on('entrada5', function () {
     console.log('bola5')
+    if (!anim) return;
     anim.goToAndPlay('bola5', true);
 });
 
 webcg.on('entrada6', function () {
     console.log('bola6')
+    if (!anim) return;
     anim.goToAndPlay('bola6', true);
 });
 
 
 webcg.on('startclock', function () {
+   if (!anim) return;
    startClock();
 });
 
 webcg.on('stopclock', function () {
+    if (!anim) return;
     stopClock();
 });
 
@@ -408,6 +419,8 @@ webcg.on('stop', function () {
     loopAnimation = false;
     nextAnimation = 'stop'
 
+    if (!anim) return;
+
     //if (anim.isPaused) {
         if (!loopExternal) {
             anim.goToAndPlay('stop', true)
@@ -425,6 +438,7 @@ webcg.on('stop', function () {
 
 webcg.on('playAnimation', function (animationName) {
     console.log('playAnimation ' + animationName)
+    if (!anim) return;
     anim.goToAndPlay(animationName, true);
 });
 
@@ -434,7 +448,7 @@ webcg.on('update', function () {
         clearTimeout(loopRepeat);
     }
 
-    if (anim.isPaused || loopExternal) {
+    if (!anim || anim.isPaused || loopExternal) {
         loopTiming = 0
 
     } else if (isOn) {
@@ -447,7 +461,7 @@ webcg.on('update', function () {
 let sfxPlayed = false; // prevent it from playing multiple times
 
 
-anim.addEventListener('enterFrame', (e) => {
+function onEnterFrame(e) {
     const currentFrame = e.currentTime;
 
     // Play sound only if audio_inframe exists and is valid
@@ -465,7 +479,7 @@ anim.addEventListener('enterFrame', (e) => {
             sfxPlayed = true;
         }
     }
-});
+}
 
 
 
@@ -540,5 +554,39 @@ animPromise.then(() => {
         return;
     }
     startClock();
-   
+
 });
+
+
+// Arranque de la animación principal.
+//
+// Se hace acá abajo, en una función, porque hay templates que no saben qué cargar hasta que llegan los
+// datos de casparcg: el recap unificado necesita la lista de juegos activos para componer el gráfico
+// antes de crear la animación. Esos templates definen `window.RECAP_BOOT` y llaman a `boot()` cuando
+// están listos; el resto arranca de una, igual que siempre.
+function bootAnimation(source) {
+    anim = loadAnimation(source, animContainer);
+    anim.addEventListener('config_ready', onConfigReady);
+    anim.addEventListener('complete', onComplete);
+    anim.addEventListener('enterFrame', onEnterFrame);
+    anim.addEventListener('DOMLoaded', function () {
+        animLoaded = true;
+        resolveAnimPromise('Animation ready to play');
+    });
+
+    // Cuando se carga por ruta, lottie va por XHR y estos eventos llegan después de registrarlos.
+    // Cuando se carga con un objeto ya armado en memoria, en cambio, configura de forma SÍNCRONA
+    // dentro de loadAnimation() y los eventos ya pasaron. Se cubren los dos casos.
+    if (anim.renderer && anim.renderer.data) onConfigReady();
+    if (anim.isLoaded) {
+        animLoaded = true;
+        resolveAnimPromise('Animation ready to play');
+    }
+    return anim;
+}
+
+if (typeof window.RECAP_BOOT === 'function') {
+    window.RECAP_BOOT(bootAnimation);
+} else {
+    bootAnimation(data_file);
+}
