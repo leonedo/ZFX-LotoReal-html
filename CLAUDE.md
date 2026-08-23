@@ -128,14 +128,20 @@ Para retocar cómo se ve el gráfico **no hace falta reconstruir nada**: la tabl
 
 ## Copiar a los servers
 
-```bash
-rsync -a --delete --exclude-from=.deployignore ./ usuario@server:/ruta/ZFX-LotoReal-html/
-```
+El artefacto es el **zip del Release** de GitHub, no un `rsync`. `.gitattributes` lo recorta con
+`export-ignore`: de 288.5 MB quedan **236.8** (49.4 comprimido). Todo el porqué está en
+**[DEPLOY.md](DEPLOY.md)** — la lista se verificó contra las **43 rutas** que el controlador invoca
+con `CG.Add`, en las **tres ramas** de `leonedo/LotoReal` (`master`, `recap-uni-horarios`,
+`lr-2025`), que está clonado en `../LotoReal`.
 
-`.deployignore` saca ~39 MB de 289 que no carga ningún template. La lista se armó contra las **38
-rutas que el controlador invoca con `CG.Add`** (repo `leonedo/LotoReal`, `FormaPrincipal.vb`), no
-adivinando desde el repo. Si vas a agregarle una línea, comprobá contra esas rutas primero: hay tres
-referencias que no se ven grepeando ingenuamente, y están anotadas en el encabezado del archivo.
+Antes de tocar `.gitattributes`, leé DEPLOY.md: hay cuatro formas de referencia que un grep ingenuo
+no encuentra, y el patrón de `data.all.json` va anclado porque hay **10** archivos con ese nombre y
+sólo sobra uno.
+
+Dos trampas del propio mecanismo: `export-ignore` sólo aplica **al commit que se taggea** (hay que
+commitear antes de taggear), y para probar sin commitear hace falta
+`git archive --worktree-attributes`, porque si no git lee el `.gitattributes` del commit y parece
+que la lista no hace nada.
 
 ## Convenciones a respetar
 
