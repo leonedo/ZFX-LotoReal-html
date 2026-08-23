@@ -1,0 +1,25 @@
+# Qué NO entra al zip que GitHub genera para un Release.
+#
+# Ese zip es el artefacto de deploy: se baja del release y se descomprime en el server de playout.
+# El porqué de cada línea, las 43 rutas contra las que se verificó y cómo comprobar antes de tocar
+# esta lista están en DEPLOY.md. No agregues una línea sin pasar por ahí.
+#
+# OJO: acá NO va ninguna regla `text`, `eol` ni `* text=auto`. index.js está en CRLF y lo cargan
+# 39 páginas; normalizar finales de línea lo reescribe entero. Este archivo es sólo export-ignore.
+
+# Herramientas de desarrollo. Ningún template las carga.
+/tools                    export-ignore
+/webcg-devtools.umd.js    export-ignore
+/.vscode                  export-ignore
+
+# Gráficos huérfanos: ninguna de las 3 ramas del controlador llega a ellos.
+# El patrón de data.all.json va anclado a propósito — hay 9 más con ese nombre que SÍ se usan.
+/acumulado/data.all.json  export-ignore
+/lt-chance/loop_old.json  export-ignore
+/recap/recap_5.bk.json    export-ignore
+/sueño-real               export-ignore
+
+# Documentación: se queda el README, que es lo único que ayuda a quien descomprima el zip.
+# gitattributes no admite `!patron`, pero sí desactivar un atributo con `-` en una línea posterior.
+*.md                      export-ignore
+/README.md               -export-ignore
