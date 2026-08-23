@@ -113,7 +113,11 @@ node tools/build-recap-master.mjs
 ```
 
 Pisa `recap-uni/recap-master.json`, `recap-manifest.json` y `loop.json` — **esos tres son generados,
-no se editan a mano**. `recap-uni/images/` sólo se copia si no existe.
+no se editan a mano**. Lee de `tools/origen-recap-master.json` y `tools/origen-loop.json`.
+
+`recap-uni/images/` **no** es la copia canónica de la secuencia de transición: esos 50 frames salen
+de `sequence/full/images/`, y el build sólo verifica que estén ahí con las dimensiones que declara
+el asset. En `recap-uni/images/` quedan los dos logos propios de la entrega.
 
 El build es determinista: corrido dos veces sobre la misma entrada da archivos idénticos. Si después
 de correrlo `git diff recap-uni/` muestra algo que no esperabas, hay un bug en el build o alguien
@@ -128,7 +132,7 @@ Para retocar cómo se ve el gráfico **no hace falta reconstruir nada**: la tabl
 rsync -a --delete --exclude-from=.deployignore ./ usuario@server:/ruta/ZFX-LotoReal-html/
 ```
 
-`.deployignore` saca ~70 MB de 366 que no carga ningún template. La lista se armó contra las **38
+`.deployignore` saca ~39 MB de 289 que no carga ningún template. La lista se armó contra las **38
 rutas que el controlador invoca con `CG.Add`** (repo `leonedo/LotoReal`, `FormaPrincipal.vb`), no
 adivinando desde el repo. Si vas a agregarle una línea, comprobá contra esas rutas primero: hay tres
 referencias que no se ven grepeando ingenuamente, y están anotadas en el encabezado del archivo.
@@ -140,9 +144,15 @@ referencias que no se ven grepeando ingenuamente, y están anotadas en el encabe
 - Los mensajes de commit y los comentarios del código van **en español**, como el resto del repo.
 - Los templates viejos (`recaps/`, `recap/`) se dejan en su lugar hasta que el unificado se estabilice:
   son el plan de rollback.
-- `New_aug_2026/` es material crudo del diseñador. Sus imágenes están deduplicadas contra
-  `recap-uni/images/` (los JSON apuntan ahí por ruta relativa), así que borrar esa carpeta de
-  producción rompe las entregas de referencia.
+- Las dos entradas del build del recap unificado viven en `tools/` (`origen-recap-master.json` y
+  `origen-loop.json`). Son la entrega de agosto de 2026 ya deduplicada, no material crudo: sus
+  imágenes no están porque las levanta de `recap-uni/images/` y `sequence/full/images/`. El resto de
+  esa entrega (`New_aug_2026/`) se borró del árbol; queda en el tag **`entrega-agosto-2026`**
+  (`git show entrega-agosto-2026 --stat`). Ese commit **no es ancestro de `main`** — sin el tag, si
+  se borra la rama `claude/recaps-review-vcdpso` el material se pierde. **Hay que pushear el tag**
+  (`git push origin entrega-agosto-2026`) para que valga fuera de esta máquina.
+- **`sequence/full/images/` la usa también `recap-uni/`**, no sólo los recaps viejos. Cuando se
+  borren `recap/` y `recaps/`, esa carpeta se queda.
 
 ## Cosas rotas conocidas, preexistentes
 

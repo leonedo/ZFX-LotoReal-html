@@ -10,11 +10,18 @@
 #   - host/index.html pide "host.json" y el archivo es "Host.json" (anda sólo en Windows).
 #   - crawl/cintillo.js nombra "crawl/Cintillo.json", relativo a la raíz del server.
 #   - macOS guarda los nombres en NFD, así que "sueño-real" no matchea contra git en NFC.
+#
+# Y ojo con sequence/full/images/: no la cargan sólo recap/ y recaps/, también recap-uni/ (sus 50
+# frames de transición salen de ahí en vez de estar duplicados). No se excluye ni cuando se borren
+# los recaps viejos.
 
-# Material crudo del diseñador. Nada de producción lo referencia; son sus JSON los que
-# apuntan a recap-uni/images/. Se queda en el repo: es la referencia que permite comparar
-# una entrega nueva contra la anterior.
-New_aug_2026/
+# El build del recap unificado y sus dos JSON de entrada (~4 MB). Ningún template los carga:
+# corren en la máquina de desarrollo y lo que sale de ahí es recap-uni/.
+#
+# Esta línea es nueva: tools/ se venía copiando. Y `--delete` NO borra lo que está excluido, así que
+# en los servers ya provisionados la copia vieja se queda. Para sacarla, un `rm -rf` a mano allá, o
+# una corrida única con `--delete-excluded`.
+tools/
 
 # El controlador usa acumulado/index y nunca acumulado/resultado — de hecho no existe
 # acumulado/resultado.html. Es el único data.all.json del repo sin un HTML que lo cargue.
@@ -43,5 +50,5 @@ webcg-devtools.umd.js
 #   Ninguna ruta lo invoca. Queda por ahora en la misma categoría que recap/ y recaps/: plan
 #   de rollback. Excluilo cuando lt-chance esté confirmado en aire.
 #
-# recap-uni/  (38.1 MB) — el recap unificado. El controlador todavía no lo invoca, así que
+# recap-uni/  (4.6 MB) — el recap unificado. El controlador todavía no lo invoca, así que
 #   hoy es peso muerto en el server. En cuanto se le apunte una ruta, sacá esta nota.

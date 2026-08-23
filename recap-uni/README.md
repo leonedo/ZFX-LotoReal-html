@@ -94,9 +94,14 @@ No hace falta tocar nada más ni reconstruir el maestro para cambiar el layout.
 node tools/build-recap-master.mjs
 ```
 
-Lee la entrega del diseñador en `New_aug_2026/newDelivery/RECAP_ Posible versión Nocturna en 2 meses/`
-—el único archivo que trae los 7 juegos— y escribe esta carpeta. Ver `tools/build-recap-master.mjs`
-para qué normaliza y qué repara.
+Lee `tools/origen-recap-master.json` —la entrega del diseñador, el único archivo que trae los 7
+juegos— más `tools/origen-loop.json` para el fondo, y escribe esta carpeta. Ver
+`tools/build-recap-master.mjs` para qué normaliza y qué repara.
+
+Los 50 frames de la transición **no viven acá**: el maestro los apunta a `sequence/full/images/`,
+la misma copia que ya cargan `recap/` y `recaps/`. En `images/` sólo quedan los dos logos propios de
+la entrega de agosto (Chance Real y Repartidera), que son arte nuevo y distinto del que hay en
+`sequence/` aunque el nombre de archivo coincida.
 
 ## Archivos
 
@@ -107,6 +112,6 @@ para qué normaliza y qué repara.
 | `recap-master.json`   | generado: el Lottie con los 7 juegos                          |
 | `recap-manifest.json` | generado: qué capa es de qué juego                            |
 | `loop.json`           | generado: el fondo, que corre como loop externo               |
-| `images/`             | la secuencia de transición                                    |
+| `images/`             | **sólo** los dos logos de la entrega — la secuencia vive en `../sequence/full/images/` |
 
 `recap-master.json`, `recap-manifest.json` y `loop.json` los pisa el build: no editarlos a mano.

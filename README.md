@@ -59,9 +59,8 @@ Con `loopExternal: true`, el motor busca un **`loop.json` al lado del template**
 | `recaps/`, `recap/` | los recaps viejos, uno por combinación fija; se van cuando el unificado se estabilice |
 | `lt-*/`, `loto-*/`, `loteria-real/`, `sueño-real/` | lower thirds y resultados por sorteo |
 | `acumulado/`, `autoridades/`, `host/`, `logo/`, `slates/`, `crawl/` | el resto de los gráficos del aire |
-| `tools/` | scripts de build (no van al playout) |
-| `New_aug_2026/` | material crudo del diseñador; no se despliega |
-| `sequence/` | secuencias de transición compartidas |
+| `tools/` | el script de build del recap unificado y sus dos JSON de entrada; no van al playout |
+| `sequence/` | secuencias de transición compartidas; `full/` la usan `recap/`, `recaps/` **y `recap-uni/`** |
 
 ## Normalizar una entrega del diseñador
 
