@@ -4,27 +4,32 @@
  *
  *   node tools/build-recap-master.mjs
  *
- * Entrada  New_aug_2026/newDelivery/RECAP_ Posible versión Nocturna en 2 meses/
- *          (el único archivo que trae los 7 juegos y el null Control Central)
- * Salida   recap/recap-master.json     el maestro, con los 7 juegos
- *          recap/recap-manifest.json   qué capa pertenece a qué juego, y el layout por defecto
+ * Entrada  tools/origen-recap-master.json  la entrega de agosto de 2026: el único archivo que trae
+ *                                         los 7 juegos y el null Control Central
+ *          tools/origen-loop.json         el fondo, que corre como loop externo
+ * Salida   recap-uni/recap-master.json    el maestro, con los 7 juegos
+ *          recap-uni/recap-manifest.json  qué capa pertenece a qué juego, y el layout por defecto
+ *          recap-uni/loop.json            el fondo con sus markers
+ *
+ * Los frames de la transición no se copian: el maestro los apunta a `sequence/full/images/`, la
+ * misma copia que ya usan `recap/` y `recaps/`. En `recap-uni/images/` sólo quedan los dos logos
+ * propios de la entrega.
  *
  * El archivo del diseñador ya trae la arquitectura que necesitamos: cada juego cuelga de un null
  * `Control <Juego>`, y todos esos cuelgan de `Control Central`. Este script no reacomoda nada
  * visualmente — normaliza nombres, repara lo que viene roto y deja el archivo manejable desde código.
  */
 
-import { readFileSync, writeFileSync, mkdirSync, cpSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const DELIVERY = `${ROOT}/New_aug_2026/newDelivery/RECAP_ Posible versión Nocturna en 2 meses`;
-const SRC = `${DELIVERY}/RECAP_ Posible versión Nocturna en 2 meses.json`;
-const SRC_IMAGES = `${DELIVERY}/images`;
-const SRC_FONDO = `${ROOT}/New_aug_2026/Fondo Recap/Fondo_Recap.json`;
+const TOOLS = dirname(fileURLToPath(import.meta.url));
+const ROOT = resolve(TOOLS, '..');
+const SRC = `${TOOLS}/origen-recap-master.json`;
+const SRC_FONDO = `${TOOLS}/origen-loop.json`;
 
-/** Carpeta del template unificado. Autocontenida: es la que se despliega al playout. */
+/** Carpeta del template unificado. Es la que se despliega al playout, junto con `sequence/full/`. */
 const OUT_DIR = `${ROOT}/recap-uni`;
 const OUT_MASTER = `${OUT_DIR}/recap-master.json`;
 const OUT_MANIFEST = `${OUT_DIR}/recap-manifest.json`;
@@ -351,11 +356,47 @@ doc.assets = doc.assets.filter((a) => !String(a.p || '').toLowerCase().endsWith(
 
 // ---------------------------------------------------------------- 5c. rutas de los assets
 //
-// El template tiene que ser autocontenido: su carpeta `images/` al lado del JSON. El archivo de
-// entrada puede traer cualquier `u` (después de deduplicar las imágenes de la entrega, las suyas
-// apuntan a esta misma carpeta por un camino relativo largo), así que se normaliza siempre.
+// Los 50 frames de la transición viven dentro del precomp y son los mismos que `recap/` y `recaps/`
+// ya cargan desde `sequence/full/images/` — ahí están optimizados con paleta+alpha y pesan la cuarta
+// parte. Se apunta a esa copia en vez de duplicarla, que es lo que hacen los recaps viejos.
+//
+// Todo lo demás (los logos propios de la entrega) se queda en `images/` al lado del JSON: son arte
+// nuevo, distinto del que hay en `sequence/`, aunque el nombre de archivo coincida.
+//
+// El `u` de entrada no sirve de nada: viene de la deduplicación de la entrega y apunta a otro lado.
+const SEQ_DIR = `${ROOT}/sequence/full/images`;
+const SEQ_U = '../sequence/full/images/';
+
+/** Ancho y alto de un PNG leídos del IHDR, o null si no existe. */
+const pngSize = (file) => {
+  if (!existsSync(file)) return null;
+  const b = readFileSync(file);
+  if (b.length < 24 || b.readUInt32BE(12) !== 0x49484452) return null; // 'IHDR'
+  return { w: b.readUInt32BE(16), h: b.readUInt32BE(20) };
+};
+
+const enPrecomp = new Set();
 for (const a of doc.assets) {
-  if (a.p) a.u = 'images/';
+  for (const l of a.layers || []) if (l.refId) enPrecomp.add(l.refId);
+}
+
+for (const a of doc.assets) {
+  if (!a.p) continue;
+  if (!enPrecomp.has(a.id)) { a.u = 'images/'; continue; }
+  // Un frame de la transición TIENE que estar en la copia compartida: caer en silencio a `images/`
+  // es justo lo que dejaría el duplicado sin que nadie se entere.
+  //
+  // Ojo con lo que el chequeo de dimensiones NO cubre: los 50 frames miden todos 1920×1080, así que
+  // sólo atrapa una colisión de nombres (un logo que se cuele en el precomp, una renumeración), no
+  // una transición rehecha con el mismo tamaño. Si algún día la entrega trae arte nuevo de
+  // transición con los mismos nombres, esto pasa en silencio y sale al aire el arte viejo: ahí hace
+  // falta comparar digests, no medidas.
+  const s = pngSize(`${SEQ_DIR}/${a.p}`);
+  if (!s) die(`El frame ${a.p} de la transición no está en ${rel0(SEQ_DIR)}.`);
+  if (s.w !== a.w || s.h !== a.h) {
+    die(`${a.p} mide ${s.w}×${s.h} en ${rel0(SEQ_DIR)} y el asset declara ${a.w}×${a.h}.`);
+  }
+  a.u = SEQ_U;
 }
 
 // ---------------------------------------------------------------- 6. markers
@@ -401,17 +442,13 @@ if (!fondo.markers || fondo.markers.length === 0) {
 }
 writeFileSync(OUT_FONDO, JSON.stringify(fondo));
 
-// La secuencia de transición vive en `images/` relativo al JSON. `recap-uni/images/` es la copia
-// canónica y va versionada, así que en un clon limpio ya está y no hay nada que copiar. La copia
-// sólo corre la primera vez, cuando todavía existe la carpeta original de la entrega — que después
-// se dedupe contra ésta justamente para no tener el mismo material dos veces.
-let copied = 'ya estaba';
-if (!existsSync(OUT_IMAGES)) {
-  if (!existsSync(SRC_IMAGES)) {
-    die(`Falta ${rel0(OUT_IMAGES)} y tampoco está la carpeta original en\n    ${rel0(SRC_IMAGES)}`);
-  }
-  cpSync(SRC_IMAGES, OUT_IMAGES, { recursive: true });
-  copied = 'copiada';
+// En `recap-uni/images/` sólo quedan los assets propios de la entrega — los que el paso 5c no pudo
+// resolver contra la secuencia compartida. Van versionados, así que en un clon limpio ya están; acá
+// sólo se comprueba que no falte ninguno, porque un href roto en aire no avisa.
+const propios = doc.assets.filter((a) => a.p && a.u === 'images/').map((a) => a.p);
+const faltan = propios.filter((p) => !existsSync(`${OUT_IMAGES}/${p}`));
+if (faltan.length) {
+  die(`Faltan en ${rel0(OUT_IMAGES)}:\n    ${faltan.join('\n    ')}`);
 }
 
 console.log(`\n  Maestro del recap construido`);
@@ -432,4 +469,4 @@ const rel = rel0;
 console.log(`\n  → ${rel(OUT_MASTER)}`);
 console.log(`  → ${rel(OUT_MANIFEST)}`);
 console.log(`  → ${rel(OUT_FONDO)}  (fondo + markers)`);
-console.log(`  → ${rel(OUT_IMAGES)}/  (${copied})\n`);
+console.log(`  → ${rel(OUT_IMAGES)}/  (${propios.length} assets propios)\n`);
